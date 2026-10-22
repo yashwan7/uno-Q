@@ -1,7 +1,7 @@
 # 📡 SlothMesh RF Telemetry Dataset & Telemetry Ingestion Guide
 
 > **IMPORTANT DISCLOSURE:**
-> The primary dataset (`slothmesh_telemetry_dataset.csv`, 100,000 samples) is **SYNTHETIC**.
+> The primary dataset (`slothmesh_telemetry_dataset.csv`, 600,000 samples) is **SYNTHETIC**.
 > It was generated algorithmically using mathematical propagation and channel collision models derived from **IEEE 802.11 b/g/n (2.4 GHz)** and **IEEE 802.15.4 (Zigbee / Thread)** wireless standards.
 
 ---
@@ -11,7 +11,7 @@
 Edge RF telemetry datasets with ground-truth root cause labels (e.g., distinguishing between multipath fading, rain attenuation, co-channel contention, and antenna misalignment) cannot be easily labeled in physical field tests without laboratory spectrum analyzers and controlled anechoic chambers.
 
 To train the initial INT8 TinyML model (~4.5 KB) on the ARM Cortex-M33 coprocessor:
-1. We synthesized 100,000 telemetry snapshots covering three operational states: `HEALTHY (0)`, `DEGRADING (1)`, and `CRITICAL (2)`.
+1. We synthesized 600,000 telemetry snapshots covering three operational states: `HEALTHY (0)`, `DEGRADING (1)`, and `CRITICAL (2)`.
 2. We introduced realistic channel noise: 5% stochastic label-boundary noise and Gaussian jitter distributions to mimic imperfect hardware transceivers.
 3. Feature ranges and thresholds reflect standard transceiver registers.
 

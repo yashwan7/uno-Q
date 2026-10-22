@@ -1,10 +1,10 @@
 {
   "dataset": {
     "source": "Synthetic RF telemetry based on IEEE 802.11 & 802.15.4 propagation models",
-    "total_samples": 100000,
-    "train_samples": 70000,
-    "val_samples": 15000,
-    "test_samples": 15000,
+    "total_samples": 600000,
+    "train_samples": 420000,
+    "val_samples": 90000,
+    "test_samples": 90000,
     "features": [
       "rssi_dbm",
       "snr_db",
@@ -42,82 +42,82 @@
     "total_parameters": 803
   },
   "performance": {
-    "float32_test_accuracy": 0.9325,
-    "int8_test_accuracy": 0.9347,
-    "quantization_accuracy_drop_pct": -0.22,
+    "float32_test_accuracy": 0.9295,
+    "int8_test_accuracy": 0.933,
+    "quantization_accuracy_drop_pct": -0.35,
     "model_size_bytes": 4632,
     "model_size_kb": 4.52,
     "inference_latency_m33_ms": 1.18,
     "confusion_matrix": [
       [
-        792,
-        291,
-        2
+        17006,
+        1201,
+        22
       ],
       [
-        62,
-        6922,
-        416
+        1148,
+        41928,
+        1945
       ],
       [
-        1,
-        241,
-        6273
+        5,
+        2025,
+        24720
       ]
     ],
     "classification_report": {
       "HEALTHY": {
-        "precision": 0.9263157894736842,
-        "recall": 0.7299539170506912,
-        "f1-score": 0.8164948453608247,
-        "support": 1085.0
+        "precision": 0.9365053141692824,
+        "recall": 0.9329091008832081,
+        "f1-score": 0.9347037484885127,
+        "support": 18229.0
       },
       "DEGRADING": {
-        "precision": 0.9286289240676147,
-        "recall": 0.9354054054054054,
-        "f1-score": 0.932004847179211,
-        "support": 7400.0
+        "precision": 0.9285556096912787,
+        "recall": 0.9312987272606117,
+        "f1-score": 0.9299251455503188,
+        "support": 45021.0
       },
       "CRITICAL": {
-        "precision": 0.9375280227170827,
-        "recall": 0.9628549501151189,
-        "f1-score": 0.9500227169468424,
-        "support": 6515.0
+        "precision": 0.9262937010529472,
+        "recall": 0.9241121495327103,
+        "f1-score": 0.9252016393135842,
+        "support": 26750.0
       },
-      "accuracy": 0.9324666666666667,
+      "accuracy": 0.9294888888888889,
       "macro avg": {
-        "precision": 0.9308242454194605,
-        "recall": 0.8760714241904051,
-        "f1-score": 0.8995074698289595,
-        "support": 15000.0
+        "precision": 0.930451541637836,
+        "recall": 0.9294399925588434,
+        "f1-score": 0.929943511117472,
+        "support": 90000.0
       },
       "weighted avg": {
-        "precision": 0.9323267825120727,
-        "recall": 0.9324666666666667,
-        "f1-score": 0.9314753851500889,
-        "support": 15000.0
+        "precision": 0.9294934886563249,
+        "recall": 0.9294888888888889,
+        "f1-score": 0.9294890940072932,
+        "support": 90000.0
       }
     },
     "noise_robustness": {
       "sigma_0.05": {
         "sigma": 0.05,
-        "accuracy": 0.9227,
-        "accuracy_pct": 92.27,
-        "drop_pct": 0.97
+        "accuracy": 0.9243,
+        "accuracy_pct": 92.43,
+        "drop_pct": 0.52
       },
       "sigma_0.1": {
         "sigma": 0.1,
-        "accuracy": 0.9095,
-        "accuracy_pct": 90.95,
-        "drop_pct": 2.29
+        "accuracy": 0.9175,
+        "accuracy_pct": 91.75,
+        "drop_pct": 1.2
       },
       "sigma_0.2": {
         "sigma": 0.2,
-        "accuracy": 0.8821,
-        "accuracy_pct": 88.21,
-        "drop_pct": 5.03
+        "accuracy": 0.8922,
+        "accuracy_pct": 89.22,
+        "drop_pct": 3.73
       }
     }
   },
-  "timestamp": "2026-10-22 17:32:34 UTC"
+  "timestamp": "2026-10-22 18:12:41 UTC"
 }

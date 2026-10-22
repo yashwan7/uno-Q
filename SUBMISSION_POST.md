@@ -131,7 +131,7 @@ We evaluated our rule-based remediation baseline (`agent/baseline_agent.py`) aga
 
 ## ⚠️ Limitations & Future Work
 
-- **Synthetic Training Telemetry:** The initial 100,000-sample dataset was synthetically generated from mathematical IEEE propagation formulas. We have provided `data/log_real_telemetry.py` to capture live transceiver frames for retraining.
+- **Synthetic Training Telemetry:** The initial 600,000-sample dataset was synthetically generated from mathematical IEEE propagation formulas. We have provided `data/log_real_telemetry.py` to capture live transceiver frames for retraining.
 - **Power Profiler Verification:** While the 1.18 ms execution time is verified via DWT cycle counters, whole-board current traces are scheduled for measurement with a Nordic PPK2 as outlined in `docs/POWER_MEASUREMENT.md`.
 - **What's Next:** Direct on-device GGUF inference via `llama-cpp-python` (removing the Ollama daemon) and NPU hardware acceleration via Qualcomm AI Hub.
 

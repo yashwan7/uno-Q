@@ -99,7 +99,7 @@ The TinyML model and agents ingest 6 MAC/PHY physical features:
 6. `jitter_ms`: Packet inter-arrival delay variance ($J = J + \frac{|D(i-1, i)| - J}{16}$).
 
 > **Synthetic Dataset Disclosure:**  
-> The training dataset (`data/slothmesh_telemetry_dataset.csv`, 100,000 samples) is **synthetically generated** from mathematical propagation and collision models derived from IEEE 802.11 and 802.15.4 standards. An optional physical logging utility (`data/log_real_telemetry.py`) is provided to capture live serial frames for real-world retraining. See [data/README.md](data/README.md) for generation formulas and distribution parameters.
+> The training dataset (`data/slothmesh_telemetry_dataset.csv`, 600,000 samples) is **synthetically generated** from mathematical propagation and collision models derived from IEEE 802.11 and 802.15.4 standards. An optional physical logging utility (`data/log_real_telemetry.py`) is provided to capture live serial frames for real-world retraining. See [data/README.md](data/README.md) for generation formulas and distribution parameters.
 
 ---
 
@@ -253,7 +253,7 @@ uno-Q/
 └── data/
     ├── README.md                      # Dataset documentation & synthetic formulas
     ├── log_real_telemetry.py          # Utility to capture live hardware serial frames
-    └── slothmesh_telemetry_dataset.csv# 100,000 synthetic RF telemetry samples
+    └── slothmesh_telemetry_dataset.csv# 600,000 synthetic RF telemetry samples
 ```
 
 ---
