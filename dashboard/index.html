@@ -2,345 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>RESq MESH // SlothMesh Tactical CAD & Edge AI Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SlothMesh | Autonomous Edge AI Mesh for Arduino UNO Q</title>
+  
+  <!-- Leaflet Tactical CAD Map Styles -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- High-Tech Monospace & Tactical Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <!-- Background Glow Accents -->
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
-  <div class="glow-orb orb-3"></div>
-
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="brand">
-        <div class="brand-icon">🦥</div>
-        <div>
-          <div class="brand-title-wrap">
-            <h1 class="brand-title">SlothMesh</h1>
-            <span class="badge badge-accent">Slow & Steady Edition</span>
-          </div>
-          <p class="brand-subtitle">The Zero-Effort, Energy-Paced Cognitive Edge Mesh Network</p>
+<body class="tactical-hud">
+  <!-- Top Command Header -->
+  <header class="hud-header">
+    <div class="hud-branding">
+      <div class="hud-icon-box">📡</div>
+      <div>
+        <div class="hud-title-row">
+          <h1 class="hud-title">RESq MESH // TACTICAL CAD</h1>
+          <span class="hud-tag">MIL-SPEC EDGE AI</span>
+          <span class="hud-tag location-tag">SIR MVIT · 13.1511° N, 77.6084° E</span>
         </div>
+        <p class="hud-subtitle">DUAL-CORE SENTINEL · ARDUINO UNO Q (LINUX + QWEN 0.6B) · NXP FRDM-MCXN236 (TINYML INT8)</p>
       </div>
-      <div class="header-badges">
-        <div class="hardware-pill">
-          <span class="pulse-dot green"></span>
-          <span>Arduino UNO Q (Snapdragon + Linux)</span>
-        </div>
-        <div class="hardware-pill">
-          <span class="pulse-dot blue"></span>
-          <span>ARM Cortex-M33 (TinyML INT8)</span>
-        </div>
-        <div class="hardware-pill">
-          <span class="badge-tag">DevChallenge 2026</span>
-        </div>
+    </div>
+    
+    <div class="hud-system-status">
+      <div class="status-box">
+        <span class="lbl">CORE TRANSPORT</span>
+        <span class="val green-text"><span class="pulse-sq"></span> USB-CDC / LIVE</span>
       </div>
-    </header>
-
-    <!-- Sloth Hero Stats Bar -->
-    <section class="sloth-hero-grid">
-      <div class="glass-card sloth-status-card">
-        <div class="card-label">Hardware State</div>
-        <div class="status-indicator-wrap">
-          <div class="sloth-avatar" id="slothAvatar">😴</div>
-          <div>
-            <div class="sloth-state-title" id="slothStateTitle">Low-Power Sloth Nap</div>
-            <div class="sloth-state-sub" id="slothStateSub">Cortex-M33 asleep in deep standby (35 µA draw). Link healthy.</div>
-          </div>
-        </div>
+      <div class="status-box">
+        <span class="lbl">SAFETY SYSTEM</span>
+        <span class="val cyan-text">LAYA SYSTEM-1</span>
       </div>
-
-      <div class="glass-card stat-metric-card">
-        <div class="card-label">Energy Conserved</div>
-        <div class="metric-value-wrap">
-          <span class="big-metric green-text" id="energySavedMetric">94.8%</span>
-          <span class="metric-sub">vs Continuous WiFi</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill green-gradient" style="width: 94.8%;"></div>
-        </div>
+      <div class="status-box">
+        <span class="lbl">LOCAL SLM</span>
+        <span class="val purple-text">QWEN 3 (0.6B)</span>
       </div>
-
-      <div class="glass-card stat-metric-card">
-        <div class="card-label">Human Effort Required</div>
-        <div class="metric-value-wrap">
-          <span class="big-metric purple-text">0.00 <span class="unit">min</span></span>
-          <span class="metric-sub">100% Autonomous</span>
-        </div>
-        <div class="lazy-badge">Zero Couch Departures</div>
+      <div class="status-box">
+        <span class="lbl">COGNITIVE LATENCY</span>
+        <span class="val yellow-text">1.18 MS / 1.82 S</span>
       </div>
+    </div>
+  </header>
 
-      <div class="glass-card stat-metric-card">
-        <div class="card-label">TinyML Latency</div>
-        <div class="metric-value-wrap">
-          <span class="big-metric blue-text" id="m33LatencyMetric">1.18 <span class="unit">ms</span></span>
-          <span class="metric-sub">Cortex-M33 INT8</span>
-        </div>
-        <div class="model-size-badge">4.5 KB Model Size</div>
+  <!-- KPI Tactical Bar (Sharp Edges) -->
+  <section class="kpi-grid">
+    <div class="kpi-panel">
+      <div class="panel-header">NODE 01 STATUS (NXP FRDM)</div>
+      <div class="kpi-main">
+        <span class="kpi-status green-text" id="kpiNode1Status">NORMAL</span>
+        <span class="kpi-aux" id="kpiNode1Rssi">-62 dBm</span>
       </div>
-    </section>
+      <div class="kpi-sub">Cortex-M33 Active · Streaming 9-byte frames @ 1Hz</div>
+    </div>
 
-    <!-- Main Layout Grid -->
-    <main class="main-dashboard-grid">
-      <!-- Left Column: Real-time Telemetry & Scenario Injector -->
-      <section class="dashboard-col left-col">
-        <!-- Scenario Presets -->
-        <div class="glass-card">
-          <div class="card-header-clean">
-            <h2 class="section-title">🧪 Edge RF Scenarios & Sloth Testbench</h2>
-            <span class="pill-label">Interactive</span>
+    <div class="kpi-panel">
+      <div class="panel-header">NODE 02 STATUS (UNO Q GATEWAY)</div>
+      <div class="kpi-main">
+        <span class="kpi-status green-text" id="kpiNode2Status">ONLINE</span>
+        <span class="kpi-aux" id="kpiNode2Channel">CHANNEL 6</span>
+      </div>
+      <div class="kpi-sub">Linux Application Host · 4GB RAM / 32GB eMMC</div>
+    </div>
+
+    <div class="kpi-panel">
+      <div class="panel-header">POWER & PACING STATE</div>
+      <div class="kpi-main">
+        <span class="kpi-status green-text" id="kpiPowerMode">SLOTH PACED (35 µA)</span>
+        <span class="kpi-aux">94.8% SAVED</span>
+      </div>
+      <div class="kpi-sub">Zero continuous polling · Event interrupt wake</div>
+    </div>
+
+    <div class="kpi-panel">
+      <div class="panel-header">LAYA SAFETY INVARIANT</div>
+      <div class="kpi-main">
+        <span class="kpi-status cyan-text" id="kpiLayaAction">CONTINUE_NORMAL</span>
+        <span class="kpi-aux">0 OVERRIDES</span>
+      </div>
+      <div class="kpi-sub">NOULs telemetry bound checks active (100% deterministic)</div>
+    </div>
+  </section>
+
+  <!-- Main View Grid -->
+  <main class="hud-main-grid">
+    <!-- Left Column: Tactical Leaflet Radar Map (Sharp Corners) -->
+    <section class="map-column">
+      <div class="cad-map-panel">
+        <div class="cad-map-top-overlay">
+          <div class="cad-map-badge" id="mapCoordinatesBadge">
+            📍 TACTICAL RADAR · SIR MVIT CAMPUS (13.151128, 77.608432) · 4 MESH NODES ACTIVE
           </div>
-          <p class="section-desc">Select an environmental condition or inject RF interference to see how SlothMesh responds autonomously without human troubleshooting:</p>
-          <div class="scenario-buttons-grid" id="scenarioButtons">
-            <!-- Buttons injected by app.js -->
-          </div>
-        </div>
-
-        <!-- Telemetry Gauges -->
-        <div class="glass-card">
-          <div class="card-header-clean">
-            <h2 class="section-title">📡 Real-Time RF Link Telemetry</h2>
-            <div class="live-tag"><span class="pulse-dot green"></span> Live Sensor Bus</div>
-          </div>
-          <div class="telemetry-grid">
-            <div class="gauge-card" id="gaugeRssi">
-              <div class="gauge-label">Signal (RSSI)</div>
-              <div class="gauge-value" id="valRssi">-55 <span class="unit">dBm</span></div>
-              <div class="gauge-badge" id="badgeRssi">Optimal</div>
-            </div>
-            <div class="gauge-card" id="gaugeSnr">
-              <div class="gauge-label">SNR</div>
-              <div class="gauge-value" id="valSnr">30 <span class="unit">dB</span></div>
-              <div class="gauge-badge" id="badgeSnr">Strong</div>
-            </div>
-            <div class="gauge-card" id="gaugePer">
-              <div class="gauge-label">Packet Error Rate</div>
-              <div class="gauge-value" id="valPer">1.0 <span class="unit">%</span></div>
-              <div class="gauge-badge" id="badgePer">Minimal</div>
-            </div>
-            <div class="gauge-card" id="gaugeRetries">
-              <div class="gauge-label">Frame Retries</div>
-              <div class="gauge-value" id="valRetries">0 <span class="unit">pkts</span></div>
-              <div class="gauge-badge" id="badgeRetries">Clean</div>
-            </div>
-            <div class="gauge-card" id="gaugeBusy">
-              <div class="gauge-label">Channel Occupancy</div>
-              <div class="gauge-value" id="valBusy">15 <span class="unit">%</span></div>
-              <div class="gauge-badge" id="badgeBusy">Quiet</div>
-            </div>
-            <div class="gauge-card" id="gaugeJitter">
-              <div class="gauge-label">Latency Jitter</div>
-              <div class="gauge-value" id="valJitter">5 <span class="unit">ms</span></div>
-              <div class="gauge-badge" id="badgeJitter">Stable</div>
-            </div>
-          </div>
-
-          <!-- Fine Tuning Sliders -->
-          <div class="sliders-accordion">
-            <div class="slider-group">
-              <label for="sliderRssi">Custom RSSI: <span id="lblRssi">-55 dBm</span></label>
-              <input type="range" id="sliderRssi" min="-105" max="-40" value="-55">
-            </div>
-            <div class="slider-group">
-              <label for="sliderJitter">Custom Jitter: <span id="lblJitter">5 ms</span></label>
-              <input type="range" id="sliderJitter" min="1" max="150" value="5">
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right Column: Dual-Core Architecture Pipeline & AI Agent Reasoning -->
-      <section class="dashboard-col right-col">
-        <!-- Dual Architecture Co-Design Pipeline -->
-        <div class="glass-card">
-          <div class="card-header-clean">
-            <h2 class="section-title">⚡ Dual-Core Hardware Co-Design</h2>
-            <span class="pill-label">Arduino UNO Q</span>
-          </div>
-
-          <div class="pipeline-flow">
-            <!-- Stage 1 -->
-            <div class="pipe-node active" id="pipeStage1">
-              <div class="pipe-icon">📟</div>
-              <div class="pipe-content">
-                <div class="pipe-title">1. Cortex-M33 Coprocessor</div>
-                <div class="pipe-desc">Runs 4.5KB INT8 TinyML model every 5s. Evaluates RF link in 1.18 ms.</div>
-                <div class="pipe-status" id="stage1Status">Status: HEALTHY (Sleep Pacing Active)</div>
-              </div>
-            </div>
-
-            <div class="pipe-connector" id="pipeConn1">
-              <div class="pipe-arrow">↓</div>
-              <span class="connector-label">Wake Interrupt (GPIO 3)</span>
-            </div>
-
-            <!-- Stage 2 -->
-            <div class="pipe-node" id="pipeStage2">
-              <div class="pipe-icon">🧠</div>
-              <div class="pipe-content">
-                <div class="pipe-title">2. Arduino UNO Q Linux Host (Open SLM)</div>
-                <div class="pipe-desc">Runs quantized Qwen / Gemma via local Ollama. Zero internet connection.</div>
-                <div class="pipe-status" id="stage2Status">Host Processor: Sloth Standby</div>
-              </div>
-            </div>
-
-            <div class="pipe-connector" id="pipeConn2">
-              <div class="pipe-arrow">↓</div>
-              <span class="connector-label">Hardware Actuation</span>
-            </div>
-
-            <!-- Stage 3 -->
-            <div class="pipe-node" id="pipeStage3">
-              <div class="pipe-icon">🎯</div>
-              <div class="pipe-content">
-                <div class="pipe-title">3. Autonomous Physical Sentinel Actuation</div>
-                <div class="pipe-desc">Switches diversity antenna or executes seamless RF channel hop.</div>
-                <div class="pipe-status" id="stage3Status">Mesh State: Channel 6 | Ant 0 (Nominal)</div>
-              </div>
-            </div>
+          <div class="cad-map-layers">
+            <button class="map-layer-btn active" id="btnLayerSat" onclick="setMapLayer('satellite')">SATELLITE</button>
+            <button class="map-layer-btn" id="btnLayerDark" onclick="setMapLayer('dark')">TACTICAL DARK</button>
+            <button class="map-layer-btn" id="btnLayerOsm" onclick="setMapLayer('osm')">STREETS</button>
           </div>
         </div>
 
-        <!-- AI Agent Terminal & Log -->
-        <div class="glass-card terminal-card">
-          <div class="card-header-clean">
-            <div class="terminal-title">
-              <span class="term-dot red"></span>
-              <span class="term-dot yellow"></span>
-              <span class="term-dot green"></span>
-              <span class="term-name">sloth_agent.py (Local Open-Weight Model Stream)</span>
-            </div>
-            <button class="btn-clear" id="btnClearLog">Clear Log</button>
-          </div>
-          <div class="terminal-body" id="terminalBody">
-            <div class="log-line info">[00:00:01] 🦥 SlothMesh Daemon initialized on Arduino UNO Q (Linux + Cortex-M33)</div>
-            <div class="log-line info">[00:00:01] Loading TinyML INT8 weights: models/slothmesh_int8.tflite (4,568 bytes)</div>
-            <div class="log-line info">[00:00:01] Local SLM attached: qwen3:0.6b (Localhost:11434, 100% Offline)</div>
-            <div class="log-line success">[00:00:02] Link is HEALTHY. Entering low-power Sloth sleep mode... zZz</div>
-          </div>
-        </div>
-      </section>
-    </main>
+        <!-- Leaflet Map Container -->
+        <div id="cad_leaflet_map"></div>
 
-    <!-- Bottom Section: Open-Weight Benchmark Explorer -->
-    <section class="glass-card benchmark-section">
-      <div class="card-header-clean">
-        <div>
-          <h2 class="section-title">📊 Open-Weight Model Edge Telemetry Benchmark</h2>
-          <p class="section-desc">Comparing open-weight models on edge RF telemetry verification (Factual Hallucination & Latency Test)</p>
-        </div>
-        <div class="bench-tabs">
-          <button class="tab-btn active" data-tab="summary">Executive Summary</button>
-          <button class="tab-btn" data-tab="details">Scenario Breakdown</button>
+        <div class="cad-map-bot-overlay">
+          <div class="legend-item"><span class="legend-sq green"></span> GATEWAY (UNO Q)</div>
+          <div class="legend-item"><span class="legend-sq blue"></span> NXP M33 SENTINEL</div>
+          <div class="legend-item"><span class="legend-sq yellow"></span> ESP32 RELAYS</div>
+          <div class="legend-item"><span class="legend-sq red"></span> RF JAM / CRITICAL</div>
+          <div class="legend-item map-zoom-info" id="mapCenterInfo">Sir MVIT Campus · Yelahanka, Bengaluru</div>
         </div>
       </div>
 
-      <div class="tab-content active" id="tabSummary">
-        <div class="table-responsive">
-          <table class="benchmark-table">
-            <thead>
-              <tr>
-                <th>Model</th>
-                <th>Parameters</th>
-                <th>RAM Footprint</th>
-                <th>Hardware Target</th>
-                <th>Clean Pass / 8</th>
-                <th>Avg Latency</th>
-                <th>Hallucination Defense</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>TinyML INT8 MLP</strong></td>
-                <td>800 params</td>
-                <td>&lt; 5 KB</td>
-                <td>ARM Cortex-M33 (M33 Core)</td>
-                <td><span class="badge badge-success">8 / 8</span></td>
-                <td>1.18 ms</td>
-                <td>Deterministic (Zero Hallucination)</td>
-              </tr>
-              <tr class="highlight-row">
-                <td><strong>Qwen 3 (0.6B)</strong></td>
-                <td>0.6 Billion</td>
-                <td>522 MB</td>
-                <td>Arduino UNO Q (4GB Host SoC)</td>
-                <td><span class="badge badge-accent">7 / 8</span></td>
-                <td>1.82 s</td>
-                <td>Factual (Strict Schema Guard)</td>
-              </tr>
-              <tr>
-                <td><strong>Qwen 3 (4B)</strong></td>
-                <td>4.0 Billion</td>
-                <td>2.5 GB</td>
-                <td>Arduino UNO Q (Linux NPU/SoC)</td>
-                <td><span class="badge badge-accent">8 / 8</span></td>
-                <td>4.61 s</td>
-                <td>Flawless Causal Reasoning</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Quick Telemetry Telemetry Gauges -->
+      <div class="hud-panel telemetry-matrix">
+        <div class="panel-header">
+          <span>📡 REAL-TIME RF TELEMETRY MATRIX</span>
+          <span class="panel-header-right">LIVE TRANSCEIVER REGISTERS</span>
         </div>
-      </div>
-
-      <div class="tab-content" id="tabDetails" style="display: none;">
-        <div class="scenarios-table-wrap">
-          <table class="benchmark-table">
-            <thead>
-              <tr>
-                <th>Scenario ID</th>
-                <th>Condition</th>
-                <th>TinyML Class</th>
-                <th>Autonomous Remediation</th>
-                <th>Human Effort Saved</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>S01_healthy</code></td>
-                <td>Quiet Sunshine</td>
-                <td>HEALTHY</td>
-                <td>Remain in Sloth Sleep (35 µA)</td>
-                <td>0 min (Uninterrupted)</td>
-              </tr>
-              <tr>
-                <td><code>S02_degrading</code></td>
-                <td>Rain Fade / Multipath</td>
-                <td>DEGRADING</td>
-                <td>Switch to Diversity Antenna (GPIO 4)</td>
-                <td>15 min manual cable check avoided</td>
-              </tr>
-              <tr>
-                <td><code>S03_critical</code></td>
-                <td>RF Blackout / Jam</td>
-                <td>CRITICAL</td>
-                <td>Autonomous Channel Hop (Ch 6 -> 11)</td>
-                <td>45 min downtime & reboot avoided</td>
-              </tr>
-              <tr>
-                <td><code>S04_congestion</code></td>
-                <td>Channel Congestion</td>
-                <td>DEGRADING</td>
-                <td>Tune Backoff Pacing & CCA</td>
-                <td>20 min router config avoided</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="matrix-grid">
+          <div class="matrix-cell">
+            <span class="m-lbl">RSSI</span>
+            <span class="m-val" id="dispRssi">-62.0 <small>dBm</small></span>
+            <span class="m-badge badge-normal" id="badgeRssi">NOMINAL</span>
+          </div>
+          <div class="matrix-cell">
+            <span class="m-lbl">SNR</span>
+            <span class="m-val" id="dispSnr">24.0 <small>dB</small></span>
+            <span class="m-badge badge-normal" id="badgeSnr">STRONG</span>
+          </div>
+          <div class="matrix-cell">
+            <span class="m-lbl">PACKET ERROR</span>
+            <span class="m-val" id="dispPer">1.0 <small>%</small></span>
+            <span class="m-badge badge-normal" id="badgePer">CLEAN</span>
+          </div>
+          <div class="matrix-cell">
+            <span class="m-lbl">RETRIES</span>
+            <span class="m-val" id="dispRetries">0 <small>pkts</small></span>
+            <span class="m-badge badge-normal" id="badgeRetries">LOW</span>
+          </div>
+          <div class="matrix-cell">
+            <span class="m-lbl">CHANNEL BUSY</span>
+            <span class="m-val" id="dispBusy">18 <small>%</small></span>
+            <span class="m-badge badge-normal" id="badgeBusy">CLEAR</span>
+          </div>
+          <div class="matrix-cell">
+            <span class="m-lbl">JITTER</span>
+            <span class="m-val" id="dispJitter">6.0 <small>ms</small></span>
+            <span class="m-badge badge-normal" id="badgeJitter">STABLE</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-      <p>🦥 <strong>SlothMesh</strong> — Built for <strong>Hacktoberfest Open-Source AI Challenge Week 3: Slow and Steady</strong>.</p>
-      <p>Targeting <strong>Best Use of Arduino ($200)</strong> with <strong>Arduino UNO Q</strong> & ARM Cortex-M33.</p>
-    </footer>
-  </div>
+    <!-- Right Column: Dual Architecture Console & Scenario Injectors -->
+    <section class="side-column">
+      <!-- Scenario Injector -->
+      <div class="hud-panel">
+        <div class="panel-header">
+          <span>⚡ TACTICAL SCENARIO INJECTOR (LIVE DEMO)</span>
+          <span class="panel-header-right">INSTANT ACTUATION</span>
+        </div>
+        <div class="scenario-btn-list">
+          <button class="tactical-btn active" onclick="injectScenario('normal')">
+            <span class="t-btn-title">01 // QUIET SUNSHINE (NORMAL)</span>
+            <span class="t-btn-sub">Nominal RF link · Low-power Sloth nap (35 µA)</span>
+          </button>
+          <button class="tactical-btn" onclick="injectScenario('degrading')">
+            <span class="t-btn-title">02 // RAIN FADE / MULTIPATH (DEGRADING)</span>
+            <span class="t-btn-sub">RSSI drops to -82 dBm, Jitter 38ms · Triggers Diversity Antenna Switch</span>
+          </button>
+          <button class="tactical-btn" onclick="injectScenario('critical')">
+            <span class="t-btn-title">03 // RF BLACKOUT / COLLISION (CRITICAL)</span>
+            <span class="t-btn-sub">74% Packet loss · Laya triggers emergency Channel Hop (Ch 6 -> 11)</span>
+          </button>
+          <button class="tactical-btn" onclick="injectScenario('timeout')">
+            <span class="t-btn-title">04 // NODE UNREACHABLE (TIMEOUT > 3.5s)</span>
+            <span class="t-btn-sub">Simulates complete node disconnection / power loss</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Laya Safety & Decision Audit -->
+      <div class="hud-panel">
+        <div class="panel-header">
+          <span>🛡️ LAYA SYSTEM-1 SAFETY DECISION AUDIT</span>
+          <span class="panel-header-right">STRICT INVARIANT</span>
+        </div>
+        <div class="audit-box">
+          <div class="audit-row">
+            <span class="a-label">ENFORCED ACTION:</span>
+            <span class="a-val cyan-text" id="auditAction">CONTINUE_NORMAL_OPERATION</span>
+          </div>
+          <div class="audit-row">
+            <span class="a-label">DETERMINISTIC CAUSE:</span>
+            <span class="a-val" id="auditCause">All metrics within optimal NOUL bounds. Zero packet loss.</span>
+          </div>
+          <div class="audit-row">
+            <span class="a-label">LLM VALIDATION:</span>
+            <span class="a-val green-text" id="auditLlmValid">PASSED (CONSISTENT WITH PHYSICAL FACTS)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Event & SLM Console Log -->
+      <div class="hud-panel console-panel">
+        <div class="panel-header">
+          <span>📟 ARDUINO UNO Q ORCHESTRATION CONSOLE</span>
+          <button class="btn-hud-clear" onclick="clearConsole()">CLEAR</button>
+        </div>
+        <div class="console-body" id="consoleBody">
+          <div class="c-line info">[BOOT] Initialized RESq Mesh / SlothMesh Tactical CAD</div>
+          <div class="c-line info">[GEO] Radar FOCAL coordinates set to Sir MVIT: 13.151128, 77.608432</div>
+          <div class="c-line success">[NXP] Attached to /dev/cu.usbmodemFIK54L1PUAFFP3 (115200 baud)</div>
+          <div class="c-line success">[SLM] Local Qwen 3 (0.6B) ready via Ollama (100% offline)</div>
+          <div class="c-line normal">[00:00:01] Node-01 Link NORMAL. Power-saving Sloth nap engaged...</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Tactical HUD Footer -->
+  <footer class="hud-footer">
+    <div class="f-item">LOCATION: SIR M. VISVESVARAYA INSTITUTE OF TECHNOLOGY (SIR MVIT), BENGALURU</div>
+    <div class="f-item">TARGET: ARDUINO UNO Q & NXP FRDM-MCXN236</div>
+    <div class="f-item">DEV CHALLENGE: SLOW & STEADY / BEST USE OF ARDUINO ($200)</div>
+  </footer>
 
   <script src="app.js"></script>
 </body>

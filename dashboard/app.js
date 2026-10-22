@@ -1,280 +1,264 @@
 /**
- * 🦥 SlothMesh Interactive Dashboard Application Logic
- * Implements real-time edge RF telemetry simulation, dual-core pipeline visualization,
- * and autonomous open-weight model actuation logs.
+ * RESq MESH // SlothMesh Tactical CAD & Leaflet Engine
+ * Location: Sir M. Visvesvaraya Institute of Technology (Sir MVIT), Bengaluru
+ * Coordinates: 13.151128, 77.608432
  */
 
-const SCENARIOS = [
+// Sir MVIT Campus Focal Point
+const SIR_MVIT_COORDS = [13.151128, 77.608432];
+
+// Mesh Nodes Distributed across Sir MVIT Campus
+const MESH_NODES = [
   {
-    id: "s01",
-    name: "🌞 Quiet Sunshine",
-    sub: "Healthy Link | Clear RF",
-    rssi: -55,
-    snr: 30,
-    per: 1.0,
-    retries: 0,
-    busy: 15,
-    jitter: 5,
-    cls: "HEALTHY",
-    action: "Remain in Sloth Sleep (35 µA)",
-    analysis: "RF link is pristine. Zero packet loss or channel contention. Conserving maximum battery.",
-    pipe1: "HEALTHY (Sleep Pacing: 5.0s)",
-    pipe2: "Standby (Host SoC Undisturbed)",
-    pipe3: "Channel 6 | Diversity Ant 0 (Nominal)"
+    id: "GATEWAY",
+    name: "Arduino UNO Q Base Station",
+    role: "Central Gateway & Local Qwen 0.6B Host",
+    coords: [13.151128, 77.608432], // Central Lab Block
+    color: "#00ff88",
+    icon: "📟"
   },
   {
-    id: "s02",
-    name: "🌧️ Rain Fade & Multipath",
-    sub: "Degrading | High Jitter",
-    rssi: -84,
-    snr: 8,
-    per: 31.0,
-    retries: 4,
-    busy: 62,
-    jitter: 42,
-    cls: "DEGRADING",
-    action: "Autonomous Diversity Antenna Switch (GPIO 4)",
-    analysis: "Multipath attenuation and jitter (42ms) detected by M33. Switched physical diversity antenna to recover gain.",
-    pipe1: "DEGRADING (Interrupt Host)",
-    pipe2: "Qwen 0.6B Active (Causal Diagnosis in 1.82s)",
-    pipe3: "Actuated: Diversity Ant 1 Active"
+    id: "NXP_M33",
+    name: "NXP FRDM-MCXN236 Sentinel",
+    role: "Cortex-M33 TinyML RF Classifier",
+    coords: [13.152450, 77.607520], // Gate 1 / Tower Block
+    color: "#00f0ff",
+    icon: "🛡️"
   },
   {
-    id: "s03",
-    name: "⚡ RF Blackout / Jam",
-    sub: "Critical | Imminent Drop",
-    rssi: -95,
-    snr: 2,
-    per: 72.0,
-    retries: 9,
-    busy: 91,
-    jitter: 120,
-    cls: "CRITICAL",
-    action: "Emergency Channel Hop (Ch 6 -> 11)",
-    analysis: "Co-channel collision storm and extreme packet loss (72%). Executed seamless channel hop to Channel 11. Zero human reboots required.",
-    pipe1: "CRITICAL (Immediate Failover Trigger)",
-    pipe2: "Local SLM Reasoned: Frequency Jam Confirmed",
-    pipe3: "Hopped: Mesh Synchronized on Channel 11"
+    id: "ESP32_ALPHA",
+    name: "ESP32 Node Alpha (Relay 1)",
+    role: "Telemetry Forwarder / Mech Dept",
+    coords: [13.153100, 77.609400], // Mech Block
+    color: "#ffb703",
+    icon: "⚡"
   },
   {
-    id: "s04",
-    name: "👥 Channel Congestion",
-    sub: "Degrading | 85% Occupancy",
-    rssi: -60,
-    snr: 25,
-    per: 2.0,
-    retries: 1,
-    busy: 85,
-    jitter: 18,
-    cls: "DEGRADING",
-    action: "Sloth Backoff Pacing Adjusted",
-    analysis: "RF signal is strong (-60 dBm), but channel occupancy is saturated at 85%. Tuned carrier-sense threshold and paced transmissions.",
-    pipe1: "DEGRADING (Channel Congestion)",
-    pipe2: "Open SLM Computed: Paced Backoff Window",
-    pipe3: "Active: Adaptive Clear-Channel Assessment"
+    id: "ESP32_BETA",
+    name: "ESP32 Node Beta (Fringe)",
+    role: "Perimeter Link / Sports Ground",
+    coords: [13.149200, 77.606800], // South Perimeter
+    color: "#bd00ff",
+    icon: "📡"
   }
 ];
 
-let activeScenarioIndex = 0;
+let mapInstance = null;
+let currentTileLayer = null;
+let nodeMarkers = {};
+let meshPolylines = [];
+let coverageCircle = null;
+
+const TILES = {
+  satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  osm: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+};
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderScenarioButtons();
-  setupEventListeners();
-  loadScenario(0);
+  initTacticalMap();
+  setupSimulationInterval();
 });
 
-function renderScenarioButtons() {
-  const container = document.getElementById("scenarioButtons");
-  container.innerHTML = "";
+function initTacticalMap() {
+  const mapDiv = document.getElementById("cad_leaflet_map");
+  if (!mapDiv) return;
 
-  SCENARIOS.forEach((sc, idx) => {
-    const btn = document.createElement("button");
-    btn.className = `scenario-btn ${idx === activeScenarioIndex ? "active" : ""}`;
-    btn.innerHTML = `
-      <div class="scenario-btn-title">${sc.name}</div>
-      <div class="scenario-btn-sub">${sc.sub}</div>
+  mapInstance = L.map("cad_leaflet_map", {
+    center: SIR_MVIT_COORDS,
+    zoom: 16,
+    zoomControl: false
+  });
+
+  L.control.zoom({ position: "topright" }).addTo(mapInstance);
+
+  // Default to Tactical Satellite Layer
+  setMapLayer("satellite");
+
+  // Add Coverage Zone around Sir MVIT
+  coverageCircle = L.circle(SIR_MVIT_COORDS, {
+    radius: 350,
+    color: "#00f0ff",
+    weight: 1,
+    fillColor: "#00f0ff",
+    fillOpacity: 0.06,
+    dashArray: "4, 6"
+  }).addTo(mapInstance);
+
+  // Plot Tactical Nodes (Square Sharp Markers)
+  MESH_NODES.forEach((n) => {
+    const markerHtml = `
+      <div style="
+        background: #05080f; 
+        border: 2px solid ${n.color}; 
+        width: 32px; 
+        height: 32px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #fff; 
+        font-size: 15px; 
+        box-shadow: 0 0 14px ${n.color};
+      ">${n.icon}</div>
     `;
-    btn.addEventListener("click", () => loadScenario(idx));
-    container.appendChild(btn);
+    const customIcon = L.divIcon({
+      html: markerHtml,
+      className: "tactical-node-icon",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker(n.coords, { icon: customIcon }).addTo(mapInstance);
+    marker.bindPopup(`
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background:#05080f; color:#fff; padding:6px; border:1px solid ${n.color};">
+        <b style="color:${n.color};">${n.name}</b><br>
+        Role: ${n.role}<br>
+        GPS: ${n.coords[0].toFixed(6)}, ${n.coords[1].toFixed(6)}<br>
+        Campus: Sir MVIT, Bengaluru
+      </div>
+    `);
+    nodeMarkers[n.id] = marker;
+  });
+
+  // Draw Initial RF Mesh Links
+  drawMeshLinks("NORMAL");
+}
+
+function setMapLayer(type) {
+  if (currentTileLayer) {
+    mapInstance.removeLayer(currentTileLayer);
+  }
+
+  const url = TILES[type] || TILES.satellite;
+  const attrib = type === "satellite" ? "Tiles &copy; Esri &mdash; Sir MVIT" : "Map tiles &copy; OpenStreetMap";
+
+  currentTileLayer = L.tileLayer(url, {
+    attribution: attrib,
+    maxZoom: 19
+  }).addTo(mapInstance);
+
+  document.querySelectorAll(".map-layer-btn").forEach((btn) => btn.classList.remove("active"));
+  const activeBtn = document.getElementById(`btnLayer${type.charAt(0).toUpperCase() + type.slice(1)}`);
+  if (activeBtn) activeBtn.classList.add("active");
+}
+
+function drawMeshLinks(status) {
+  // Clear existing lines
+  meshPolylines.forEach((l) => mapInstance.removeLayer(l));
+  meshPolylines = [];
+
+  let lineColor = "#00ff88"; // Normal
+  let lineDash = null;
+
+  if (status === "DEGRADING") {
+    lineColor = "#ffb703";
+    lineDash = "6, 6";
+  } else if (status === "CRITICAL" || status === "TIMEOUT") {
+    lineColor = "#ff3366";
+    lineDash = "3, 6";
+  }
+
+  // Links: NXP -> Gateway, ESP32 Alpha -> Gateway, ESP32 Beta -> Gateway
+  const links = [
+    [MESH_NODES[1].coords, MESH_NODES[0].coords],
+    [MESH_NODES[2].coords, MESH_NODES[0].coords],
+    [MESH_NODES[3].coords, MESH_NODES[0].coords]
+  ];
+
+  links.forEach((pts) => {
+    const pl = L.polyline(pts, {
+      color: lineColor,
+      weight: 2,
+      opacity: 0.85,
+      dashArray: lineDash
+    }).addTo(mapInstance);
+    meshPolylines.push(pl);
   });
 }
 
-function loadScenario(index) {
-  activeScenarioIndex = index;
-  const sc = SCENARIOS[index];
+/**
+ * Scenario Injector for Live Hackathon Demonstrations
+ */
+function injectScenario(type) {
+  document.querySelectorAll(".tactical-btn").forEach((b) => b.classList.remove("active"));
 
-  // Update button active state
-  document.querySelectorAll(".scenario-btn").forEach((b, i) => {
-    b.classList.toggle("active", i === index);
-  });
+  const now = new Date().toTimeString().split(" ")[0];
+  const body = document.getElementById("consoleBody");
 
-  // Update telemetry values
-  updateTelemetryUI(sc.rssi, sc.snr, sc.per, sc.retries, sc.busy, sc.jitter);
-
-  // Update Sliders
-  document.getElementById("sliderRssi").value = sc.rssi;
-  document.getElementById("lblRssi").textContent = `${sc.rssi} dBm`;
-  document.getElementById("sliderJitter").value = sc.jitter;
-  document.getElementById("lblJitter").textContent = `${sc.jitter} ms`;
-
-  // Update Sloth State and Pipeline
-  updateSlothState(sc);
-  updatePipeline(sc);
-
-  // Log to terminal
-  logToTerminal(sc);
-}
-
-function updateTelemetryUI(rssi, snr, per, retries, busy, jitter) {
-  document.getElementById("valRssi").innerHTML = `${rssi} <span class="unit">dBm</span>`;
-  document.getElementById("valSnr").innerHTML = `${snr} <span class="unit">dB</span>`;
-  document.getElementById("valPer").innerHTML = `${per.toFixed(1)} <span class="unit">%</span>`;
-  document.getElementById("valRetries").innerHTML = `${retries} <span class="unit">pkts</span>`;
-  document.getElementById("valBusy").innerHTML = `${busy} <span class="unit">%</span>`;
-  document.getElementById("valJitter").innerHTML = `${jitter} <span class="unit">ms</span>`;
-
-  // Badge updates
-  setBadge("badgeRssi", rssi > -75 ? "Optimal" : rssi > -85 ? "Fair" : "Weak", rssi > -75 ? "optimal" : rssi > -85 ? "warning" : "critical");
-  setBadge("badgeSnr", snr > 15 ? "Strong" : snr > 8 ? "Moderate" : "Poor", snr > 15 ? "optimal" : snr > 8 ? "warning" : "critical");
-  setBadge("badgePer", per < 5 ? "Minimal" : per < 25 ? "Elevated" : "Severe", per < 5 ? "optimal" : per < 25 ? "warning" : "critical");
-  setBadge("badgeRetries", retries < 2 ? "Clean" : retries < 5 ? "Retrying" : "High", retries < 2 ? "optimal" : retries < 5 ? "warning" : "critical");
-  setBadge("badgeBusy", busy < 40 ? "Quiet" : busy < 70 ? "Moderate" : "Congested", busy < 40 ? "optimal" : busy < 70 ? "warning" : "critical");
-  setBadge("badgeJitter", jitter < 15 ? "Stable" : jitter < 40 ? "Jittery" : "Spike", jitter < 15 ? "optimal" : jitter < 40 ? "warning" : "critical");
-}
-
-function setBadge(id, text, type) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  el.className = `gauge-badge badge-${type}`;
-}
-
-function updateSlothState(sc) {
-  const avatar = document.getElementById("slothAvatar");
-  const title = document.getElementById("slothStateTitle");
-  const sub = document.getElementById("slothStateSub");
-  const energy = document.getElementById("energySavedMetric");
-
-  if (sc.cls === "HEALTHY") {
-    avatar.textContent = "😴";
-    title.textContent = "Low-Power Sloth Nap";
-    title.className = "sloth-state-title green-text";
-    sub.textContent = "Cortex-M33 in deep standby (35 µA). 99% CPU idle. Conserving maximum energy.";
-    energy.textContent = "94.8%";
-  } else if (sc.cls === "DEGRADING") {
-    avatar.textContent = "🥱";
-    title.textContent = "Autonomous Self-Healing";
-    title.className = "sloth-state-title";
-    title.style.color = "var(--accent-yellow)";
-    sub.textContent = "Sub-system alerted. Local SLM executed physical antenna diversity switch.";
-    energy.textContent = "91.2%";
-  } else {
-    avatar.textContent = "⚡";
-    title.textContent = "Autonomous Channel Failover";
-    title.className = "sloth-state-title";
-    title.style.color = "var(--accent-red)";
-    sub.textContent = "Host SLM executed seamless channel hop. User didn't touch a single button.";
-    energy.textContent = "88.6%";
+  if (type === "normal") {
+    document.querySelectorAll(".tactical-btn")[0].classList.add("active");
+    updateUI("NORMAL", -62.0, 24.0, 1.0, 0, 18, 6.0, "CONTINUE_NORMAL_OPERATION", "All metrics within optimal NOUL bounds. Zero packet loss.", true);
+    drawMeshLinks("NORMAL");
+    addLog(`[${now}] 🌞 Scenario: Quiet Sunshine nominal link restored across Sir MVIT campus.`, "normal");
+  } else if (type === "degrading") {
+    document.querySelectorAll(".tactical-btn")[1].classList.add("active");
+    updateUI("DEGRADING", -82.0, 9.0, 28.0, 4, 62, 38.0, "SWITCH_DIVERSITY_ANTENNA", "Multipath fading & 38ms jitter detected by M33. Toggled diversity antenna pin (GPIO 4).", true);
+    drawMeshLinks("DEGRADING");
+    addLog(`[${now}] 🌧️ Scenario: Rain Fade / Jitter spike detected. Laya switched diversity antenna.`, "warning");
+    addLog(`[${now}] 🧠 Qwen 0.6B: Signal attenuation at Sir MVIT perimeter resolved by antenna diversity.`, "info");
+  } else if (type === "critical") {
+    document.querySelectorAll(".tactical-btn")[2].classList.add("active");
+    updateUI("CRITICAL", -95.0, 2.0, 74.0, 9, 91, 120.0, "TRIGGER_CHANNEL_FAILOVER", "Severe RF jamming & 74% packet collapse. Laya executed emergency channel hop (Ch 6 -> 11).", true);
+    drawMeshLinks("CRITICAL");
+    addLog(`[${now}] ⚡ Scenario: RF Jamming / Link Collapse. Laya triggered immediate frequency hop.`, "critical");
+    addLog(`[${now}] 🧠 Qwen 0.6B: Co-channel interference collapse confirmed. Channel shifted to 11.`, "info");
+  } else if (type === "timeout") {
+    document.querySelectorAll(".tactical-btn")[3].classList.add("active");
+    updateUI("TIMEOUT_CRITICAL", -105.0, 0.0, 100.0, 12, 100, 200.0, "MARK_NODE_UNREACHABLE", "Node-01 missed heartbeat (>3.5s). Marked unreachable by UNO Q sentinel.", true);
+    drawMeshLinks("CRITICAL");
+    addLog(`[${now}] 🚨 ALERT: Node-01 heartbeat timeout exceeded (3.5s) at Gate 1 Tower!`, "critical");
   }
 }
 
-function updatePipeline(sc) {
-  const s1 = document.getElementById("stage1Status");
-  const s2 = document.getElementById("stage2Status");
-  const s3 = document.getElementById("stage3Status");
+function updateUI(status, rssi, snr, per, retries, busy, jitter, action, cause, llmValid) {
+  // KPI Header
+  const kpi1 = document.getElementById("kpiNode1Status");
+  kpi1.textContent = status;
+  kpi1.className = `kpi-status ${status === "NORMAL" ? "green-text" : status === "DEGRADING" ? "yellow-text" : "red-text"}`;
+  document.getElementById("kpiNode1Rssi").textContent = `${rssi.toFixed(0)} dBm`;
 
-  s1.textContent = `Status: ${sc.pipe1}`;
-  s2.textContent = `Host: ${sc.pipe2}`;
-  s3.textContent = `Action: ${sc.pipe3}`;
+  document.getElementById("kpiLayaAction").textContent = action.replace(/_/g, " ");
 
-  document.getElementById("pipeStage1").classList.toggle("active", true);
-  document.getElementById("pipeStage2").classList.toggle("active", sc.cls !== "HEALTHY");
-  document.getElementById("pipeStage3").classList.toggle("active", sc.cls !== "HEALTHY");
+  // Matrix Gauges
+  document.getElementById("dispRssi").innerHTML = `${rssi.toFixed(1)} <small>dBm</small>`;
+  document.getElementById("dispSnr").innerHTML = `${snr.toFixed(1)} <small>dB</small>`;
+  document.getElementById("dispPer").innerHTML = `${per.toFixed(1)} <small>%</small>`;
+  document.getElementById("dispRetries").innerHTML = `${retries} <small>pkts</small>`;
+  document.getElementById("dispBusy").innerHTML = `${busy} <small>%</small>`;
+  document.getElementById("dispJitter").innerHTML = `${jitter.toFixed(1)} <small>ms</small>`;
+
+  // Badges
+  const badgeClass = status === "NORMAL" ? "badge-normal" : status === "DEGRADING" ? "badge-warning" : "badge-critical";
+  document.getElementById("badgeRssi").className = `m-badge ${badgeClass}`;
+  document.getElementById("badgeRssi").textContent = rssi > -75 ? "NOMINAL" : rssi > -88 ? "DEGRADED" : "CRITICAL";
+
+  // Audit Box
+  document.getElementById("auditAction").textContent = action;
+  document.getElementById("auditCause").textContent = cause;
+  document.getElementById("auditLlmValid").textContent = llmValid ? "PASSED (NOULs VALIDATED)" : "OVERRIDDEN BY LAYA";
 }
 
-function logToTerminal(sc) {
-  const body = document.getElementById("terminalBody");
-  const now = new Date().toTimeString().split(" ")[0];
-
-  const log1 = document.createElement("div");
-  log1.className = `log-line ${sc.cls === "HEALTHY" ? "success" : sc.cls === "DEGRADING" ? "warn" : "critical"}`;
-  log1.textContent = `[${now}] 📡 Cortex-M33 TinyML: Class ${sc.cls} (RSSI=${sc.rssi}dBm, PER=${sc.per}%, Jitter=${sc.jitter}ms)`;
-  body.appendChild(log1);
-
-  const log2 = document.createElement("div");
-  log2.className = "log-line info";
-  log2.textContent = `[${now}] 🧠 Open-Weight SLM: ${sc.analysis}`;
-  body.appendChild(log2);
-
-  const log3 = document.createElement("div");
-  log3.className = "log-line success";
-  log3.textContent = `[${now}] 🦥 Autonomous Actuation: ${sc.action} | Human effort: 0 min`;
-  body.appendChild(log3);
-
+function addLog(msg, type) {
+  const body = document.getElementById("consoleBody");
+  const line = document.createElement("div");
+  line.className = `c-line ${type}`;
+  line.textContent = msg;
+  body.appendChild(line);
   body.scrollTop = body.scrollHeight;
 }
 
-function setupEventListeners() {
-  // Clear log
-  document.getElementById("btnClearLog").addEventListener("click", () => {
-    document.getElementById("terminalBody").innerHTML = "";
-  });
-
-  // Slider RSSI
-  document.getElementById("sliderRssi").addEventListener("input", (e) => {
-    const val = parseInt(e.target.value);
-    document.getElementById("lblRssi").textContent = `${val} dBm`;
-    customInference();
-  });
-
-  // Slider Jitter
-  document.getElementById("sliderJitter").addEventListener("input", (e) => {
-    const val = parseInt(e.target.value);
-    document.getElementById("lblJitter").textContent = `${val} ms`;
-    customInference();
-  });
-
-  // Tab switching
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      e.target.classList.add("active");
-
-      const tab = e.target.getAttribute("data-tab");
-      document.getElementById("tabSummary").style.display = tab === "summary" ? "block" : "none";
-      document.getElementById("tabDetails").style.display = tab === "details" ? "block" : "none";
-    });
-  });
+function clearConsole() {
+  document.getElementById("consoleBody").innerHTML = "";
 }
 
-function customInference() {
-  const rssi = parseInt(document.getElementById("sliderRssi").value);
-  const jitter = parseInt(document.getElementById("sliderJitter").value);
-
-  let cls = "HEALTHY";
-  if (rssi < -88 || jitter > 80) {
-    cls = "CRITICAL";
-  } else if (rssi < -78 || jitter > 30) {
-    cls = "DEGRADING";
-  }
-
-  const simulatedSc = {
-    name: "Custom Realtime Adjustment",
-    sub: `RSSI: ${rssi}dBm | Jitter: ${jitter}ms`,
-    rssi: rssi,
-    snr: Math.max(2, Math.round(30 + (rssi + 55) * 0.5)),
-    per: Math.min(85, Math.max(1, Math.round((rssi < -80 ? 30 : 2) + jitter * 0.3))),
-    retries: rssi < -85 ? 6 : rssi < -75 ? 3 : 0,
-    busy: rssi < -80 ? 75 : 25,
-    jitter: jitter,
-    cls: cls,
-    action: cls === "CRITICAL" ? "Trigger Immediate Channel Failover" : cls === "DEGRADING" ? "Adjust Diversity Antenna" : "Conserve Power in Sleep",
-    analysis: `Dynamic user telemetry injected. Model classified state as ${cls}. Handled autonomously with zero human intervention.`,
-    pipe1: `${cls} (Inference: 1.18 ms)`,
-    pipe2: cls === "HEALTHY" ? "Standby" : "Causal Explanation Generated",
-    pipe3: cls === "CRITICAL" ? "Channel Hop Executed" : cls === "DEGRADING" ? "Antenna Switched" : "Nominal"
-  };
-
-  updateTelemetryUI(simulatedSc.rssi, simulatedSc.snr, simulatedSc.per, simulatedSc.retries, simulatedSc.busy, simulatedSc.jitter);
-  updateSlothState(simulatedSc);
-  updatePipeline(simulatedSc);
+function setupSimulationInterval() {
+  // Subtle real-world jitter fluctuation on normal link
+  setInterval(() => {
+    const kpiStatus = document.getElementById("kpiNode1Status").textContent;
+    if (kpiStatus === "NORMAL") {
+      const fluc = (Math.random() * 2 - 1).toFixed(1);
+      const curRssi = -62.0 + parseFloat(fluc);
+      document.getElementById("dispRssi").innerHTML = `${curRssi.toFixed(1)} <small>dBm</small>`;
+    }
+  }, 2500);
 }
