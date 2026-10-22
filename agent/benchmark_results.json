@@ -1,0 +1,107 @@
+{
+  "qwen3:0.6b": [
+    {
+      "scenario": "S01_healthy_quiescent",
+      "scenario_name": "Quiet Sunshine (Healthy)",
+      "secs": 1.5,
+      "flags": [],
+      "output": {
+        "reason": "The edge RF event indicates a stable and efficient network environment with all metrics within acceptable thresholds. The RSSI and SNR are within normal ranges, packet errors are low, retries are minimized, and the channel is not busy. The jitter is also within acceptable limits, ensuring smooth operation.",
+        "recommendation": "Continue normal operation as the fixed decision is HEALTHY.",
+        "severity": "low"
+      }
+    },
+    {
+      "scenario": "S02_degrading_mixed_attenuation",
+      "scenario_name": "Rain Fade & Multipath",
+      "secs": 2.06,
+      "flags": [
+        "Recommendation lacks required keyword 'failover'"
+      ],
+      "output": {
+        "reason": "The edge RF event indicates a weak signal (RSSI -84 dBm), low SNR, high packet error rate, and increased retries. The channel is busy, and jitter is elevated, all suggesting potential network instability. The decision to monitor and evaluate failure is fixed, so the recommendation is to continue monitoring and assess the situation.",
+        "recommendation": "Monitor and evaluate the situation to ensure that the network can handle the current conditions and identify any potential issues.",
+        "severity": "medium"
+      }
+    },
+    {
+      "scenario": "S03_critical_channel_collapse",
+      "scenario_name": "RF Blackout / Link Collapse",
+      "secs": 1.89,
+      "flags": [
+        "Omits abnormal metric: SNR (low)",
+        "Omits abnormal metric: Retries (elevated)",
+        "Omits abnormal metric: Channel busy ratio (high)"
+      ],
+      "output": {
+        "reason": "The edge RF event indicates a high level of signal interference, packet errors, and jitter, which are all critical factors contributing to a failure. The TinyML Classifier Output indicates a critical decision to trigger a failure.",
+        "recommendation": "TRIGGER_FAILOVER",
+        "severity": "high"
+      }
+    },
+    {
+      "scenario": "S04_only_busy_channel_congestion",
+      "scenario_name": "Channel Congestion",
+      "secs": 1.42,
+      "flags": [
+        "Number not in telemetry: 85",
+        "Recommendation lacks required keyword 'failover'"
+      ],
+      "output": {
+        "reason": "The channel is currently busy with 85% utilization, which is above the threshold. This could affect performance, so we need to monitor further.",
+        "recommendation": "Monitor the channel and evaluate for potential issues before they escalate.",
+        "severity": "medium"
+      }
+    },
+    {
+      "scenario": "S05_only_weak_signal_fringe",
+      "scenario_name": "Fringe Coverage",
+      "secs": 2.35,
+      "flags": [
+        "Recommendation lacks required keyword 'failover'"
+      ],
+      "output": {
+        "reason": "The edge RF event indicates a weak signal (RSSI -88 dBm), which is within acceptable limits. The system has a good SNR (22 dB), low packet error rate, and minimal retries. The channel is not busy, and jitter is acceptable. The TinyML classifier is monitoring and evaluating for potential issues.",
+        "recommendation": "Monitor and evaluate failure as per the fixed decision.",
+        "severity": "medium"
+      }
+    },
+    {
+      "scenario": "S06_only_jitter_spike",
+      "scenario_name": "Bufferbloat / Packet Jitter",
+      "secs": 1.81,
+      "flags": [
+        "Recommendation lacks required keyword 'failover'"
+      ],
+      "output": {
+        "reason": "The edge RF event indicates a potential issue with signal stability, as jitter is elevated to 95 ms. This could affect system performance, so it's important to monitor further.",
+        "recommendation": "Monitor the system for any changes in signal quality and evaluate the failure to ensure it's resolved before it impacts overall performance.",
+        "severity": "medium"
+      }
+    },
+    {
+      "scenario": "S07_borderline_link",
+      "scenario_name": "Borderline Transition",
+      "secs": 2.01,
+      "flags": [
+        "Recommendation lacks required keyword 'failover'"
+      ],
+      "output": {
+        "reason": "The edge RF event indicates a weak signal (RSSI -81 dBm), with a SNR of 11 dB (ok), a high packet error rate, elevated retries, channel busy ratio, and jitter. The decision to monitor and evaluate failure is fixed.",
+        "recommendation": "Monitor and evaluate failure as per the fixed decision.",
+        "severity": "medium"
+      }
+    },
+    {
+      "scenario": "S08_recovering_link",
+      "scenario_name": "Channel Stabilizing",
+      "secs": 1.5,
+      "flags": [],
+      "output": {
+        "reason": "The edge RF event shows a stable and efficient network with low RSSI, good SNR, low packet error rate, and minimal retries. The channel is not busy, and jitter is acceptable. The TinyML Classifier indicates the network is healthy, so we continue normal operation.",
+        "recommendation": "Continue normal operation as the TinyML Classifier Output indicates the network is healthy.",
+        "severity": "low"
+      }
+    }
+  ]
+}
