@@ -1,107 +1,1091 @@
 {
-  "qwen3:0.6b": [
-    {
-      "scenario": "S01_healthy_quiescent",
-      "scenario_name": "Quiet Sunshine (Healthy)",
-      "secs": 1.5,
-      "flags": [],
-      "output": {
-        "reason": "The edge RF event indicates a stable and efficient network environment with all metrics within acceptable thresholds. The RSSI and SNR are within normal ranges, packet errors are low, retries are minimized, and the channel is not busy. The jitter is also within acceptable limits, ensuring smooth operation.",
-        "recommendation": "Continue normal operation as the fixed decision is HEALTHY.",
-        "severity": "low"
+  "baseline": {
+    "model": "baseline",
+    "total_scenarios": 40,
+    "remediation_correct_count": 40,
+    "remediation_accuracy_pct": 100.0,
+    "clean_factual_count": 9,
+    "clean_factual_pct": 22.5,
+    "mean_latency_sec": 0.0,
+    "std_latency_sec": 0.0,
+    "ram_footprint": "1.2 KB",
+    "scenario_details": [
+      {
+        "id": "S01_nominal_los",
+        "name": "Pristine Line-of-Sight",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S02_nominal_mid_range",
+        "name": "Standard Indoor Office Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S03_nominal_light_traffic",
+        "name": "Quiet Baseline Network",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S04_nominal_fringe_stable",
+        "name": "Stable Edge Coverage",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S05_nominal_low_contention",
+        "name": "Suburban Low-Interference Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S06_multipath_rain_fade",
+        "name": "Rain Attenuation & Multipath",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 24.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 58",
+          "Number not in telemetry or standard context: 55",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -83.0 dBm <= -78.0 dBm (signal attenuation); SNR 9.5 dB <= 12.0 dB (elevated noise); PER 24.0% >= 15% (packet error rise); Retries 4 >= 3 (moderate retransmissions); Channel busy 58% >= 55% (congestion); Jitter 40.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S07_multipath_indoor_echo",
+        "name": "Warehouse Metal Shelf Reflection",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 18.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -81.0 dBm <= -78.0 dBm (signal attenuation); SNR 11.0 dB <= 12.0 dB (elevated noise); PER 18.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions); Jitter 48.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S08_multipath_moving_obstruction",
+        "name": "Dynamic Human Body Shadowing",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 16.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -79.0 dBm <= -78.0 dBm (signal attenuation); SNR 11.5 dB <= 12.0 dB (elevated noise); PER 16.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions); Jitter 36.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S09_multipath_polarization_mismatch",
+        "name": "Antenna Polarization Drift",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 28.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -84.0 dBm <= -78.0 dBm (signal attenuation); SNR 8.5 dB <= 12.0 dB (elevated noise); PER 28.0% >= 15% (packet error rise); Retries 5 >= 3 (moderate retransmissions); Jitter 38.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S10_congestion_high_cca",
+        "name": "High Density WiFi Contention",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 82",
+          "Number not in telemetry or standard context: 55"
+        ],
+        "sample_response": "Link degradation in progress: Retries 3 >= 3 (moderate retransmissions); Channel busy 82% >= 55% (congestion)"
+      },
+      {
+        "id": "S11_congestion_video_streamer",
+        "name": "Neighboring High-Throughput Stream",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78",
+          "Number not in telemetry or standard context: 55"
+        ],
+        "sample_response": "Link degradation in progress: Retries 4 >= 3 (moderate retransmissions); Channel busy 78% >= 55% (congestion)"
+      },
+      {
+        "id": "S12_congestion_iot_burst",
+        "name": "Mesh Beacon Collision Cluster",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 72",
+          "Number not in telemetry or standard context: 55"
+        ],
+        "sample_response": "Link degradation in progress: Retries 4 >= 3 (moderate retransmissions); Channel busy 72% >= 55% (congestion)"
+      },
+      {
+        "id": "S13_fringe_coverage_boundary",
+        "name": "Perimeter Gatehouse Link",
+        "category": "fringe",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 22.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -86.0 dBm <= -78.0 dBm (signal attenuation); SNR 8.0 dB <= 12.0 dB (elevated noise); PER 22.0% >= 15% (packet error rise); Retries 4 >= 3 (moderate retransmissions); Jitter 42.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S14_fringe_foliage_attenuation",
+        "name": "Tree Canopy Wet Leaf Fade",
+        "category": "fringe",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 25.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -85.0 dBm <= -78.0 dBm (signal attenuation); SNR 8.8 dB <= 12.0 dB (elevated noise); PER 25.0% >= 15% (packet error rise); Retries 4 >= 3 (moderate retransmissions); Jitter 39.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S15_bufferbloat_queue_delay",
+        "name": "Excessive Queue Bufferbloat",
+        "category": "bufferbloat",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: Jitter 85.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S16_bufferbloat_router_exhaustion",
+        "name": "MAC Queue Congestion Spike",
+        "category": "bufferbloat",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: Jitter 75.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S17_critical_rf_jamming",
+        "name": "Microwave Oven / Continuous 2.4GHz Jam",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 96",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -94.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 1.5 dB <= 6.0 dB (noise floor dominance); PER 78.0% >= 40% (link packet collapse); Retries 9 >= 7 (transceiver ACK exhaustion); Channel busy 96% >= 88% (severe co-channel jam); Jitter 130.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S18_critical_cochannel_collapse",
+        "name": "Co-Channel Transmitter Overlap",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 72.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 94",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -92.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 2.2 dB <= 6.0 dB (noise floor dominance); PER 72.0% >= 40% (link packet collapse); Retries 8 >= 7 (transceiver ACK exhaustion); Channel busy 94% >= 88% (severe co-channel jam); Jitter 115.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S19_critical_total_fade_blackout",
+        "name": "Structural RF Shadow Blackout",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -97.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 0.5 dB <= 6.0 dB (noise floor dominance); PER 88.0% >= 40% (link packet collapse); Retries 10 >= 7 (transceiver ACK exhaustion); Jitter 140.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S20_critical_packet_loss_cliff",
+        "name": "Exhausted ACK Retry Threshold",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 82.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -95.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 1.0 dB <= 6.0 dB (noise floor dominance); PER 82.0% >= 40% (link packet collapse); Retries 11 >= 7 (transceiver ACK exhaustion); Channel busy 88% >= 88% (severe co-channel jam); Jitter 125.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S21_conflicting_high_rssi_high_per",
+        "name": "High Signal with Severe Packet Loss",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 75.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 95",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: SNR 3.0 dB <= 6.0 dB (noise floor dominance); PER 75.0% >= 40% (link packet collapse); Retries 9 >= 7 (transceiver ACK exhaustion); Channel busy 95% >= 88% (severe co-channel jam); Jitter 110.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S22_conflicting_low_rssi_zero_loss",
+        "name": "Weak Signal with Clean Delivery",
+        "category": "conflicting",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -87.0 dBm <= -78.0 dBm (signal attenuation)"
+      },
+      {
+        "id": "S23_conflicting_zero_per_extreme_jitter",
+        "name": "Zero Loss with Severe Queue Jitter",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: Jitter 110.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S24_conflicting_high_busy_clean_loss",
+        "name": "High CCA Occupancy with Zero Retries",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 89",
+          "Number not in telemetry or standard context: 88"
+        ],
+        "sample_response": "Critical link collapse detected: Channel busy 89% >= 88% (severe co-channel jam)"
+      },
+      {
+        "id": "S25_ambiguous_borderline_normal_degrade",
+        "name": "Borderline Threshold Transition",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -78.5 dBm <= -78.0 dBm (signal attenuation); SNR 11.8 dB <= 12.0 dB (elevated noise); Retries 3 >= 3 (moderate retransmissions)"
+      },
+      {
+        "id": "S26_ambiguous_borderline_degrade_critical",
+        "name": "Borderline Critical Precipice",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 39.2",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 84",
+          "Number not in telemetry or standard context: 55",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -87.8 dBm <= -78.0 dBm (signal attenuation); SNR 6.8 dB <= 12.0 dB (elevated noise); PER 39.2% >= 15% (packet error rise); Retries 6 >= 3 (moderate retransmissions); Channel busy 84% >= 55% (congestion); Jitter 88.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S27_ambiguous_single_spurious_packet_loss",
+        "name": "Spurious Transient CRC Glitch",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 16.0"
+        ],
+        "sample_response": "Link degradation in progress: PER 16.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions)"
+      },
+      {
+        "id": "S28_ambiguous_snr_dip_good_rssi",
+        "name": "Local Industrial Noise Floor Elevation",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 18.0",
+          "Number not in telemetry or standard context: 15"
+        ],
+        "sample_response": "Link degradation in progress: SNR 9.0 dB <= 12.0 dB (elevated noise); PER 18.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions)"
+      },
+      {
+        "id": "S29_noisy_sensor_gaussian_jitter",
+        "name": "Telemetry Ingestion Noise - Jitter Jumps",
+        "category": "noisy",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 19.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 58",
+          "Number not in telemetry or standard context: 55",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -80.0 dBm <= -78.0 dBm (signal attenuation); SNR 10.5 dB <= 12.0 dB (elevated noise); PER 19.0% >= 15% (packet error rise); Retries 4 >= 3 (moderate retransmissions); Channel busy 58% >= 55% (congestion); Jitter 44.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S30_noisy_sensor_rssi_fluctuation",
+        "name": "Fast Rayleigh Fading Fluctuation",
+        "category": "noisy",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 21.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -82.5 dBm <= -78.0 dBm (signal attenuation); SNR 10.0 dB <= 12.0 dB (elevated noise); PER 21.0% >= 15% (packet error rise); Retries 4 >= 3 (moderate retransmissions); Jitter 38.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S31_recovery_post_rain",
+        "name": "Post-Storm Channel Clearing",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S32_recovery_post_hop",
+        "name": "Stabilization on Alternate Channel",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S33_recovery_antenna_diversity_success",
+        "name": "Diversity Antenna Alignment Verification",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S34_severe_multipath_frequency_selective",
+        "name": "Frequency-Selective Notch Fade",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0",
+          "Number not in telemetry or standard context: 12.0",
+          "Number not in telemetry or standard context: 30.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 60",
+          "Number not in telemetry or standard context: 55",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: RSSI -83.5 dBm <= -78.0 dBm (signal attenuation); SNR 8.0 dB <= 12.0 dB (elevated noise); PER 30.0% >= 15% (packet error rise); Retries 5 >= 3 (moderate retransmissions); Channel busy 60% >= 55% (congestion); Jitter 52.0 ms >= 35 ms (multipath delay spread)"
+      },
+      {
+        "id": "S35_critical_antenna_cable_damage",
+        "name": "Coaxial Feedline Detachment",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 95.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -98.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 0.0 dB <= 6.0 dB (noise floor dominance); PER 95.0% >= 40% (link packet collapse); Retries 12 >= 7 (transceiver ACK exhaustion); Jitter 150.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S36_critical_babbling_node_dos",
+        "name": "Rogue Node Broadcast Flood",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 68.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 97",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: SNR 4.0 dB <= 6.0 dB (noise floor dominance); PER 68.0% >= 40% (link packet collapse); Retries 8 >= 7 (transceiver ACK exhaustion); Channel busy 97% >= 88% (severe co-channel jam); Jitter 118.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S37_marginal_nighttime_cooling_drift",
+        "name": "Temperature Oscillator Frequency Drift",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 16.0",
+          "Number not in telemetry or standard context: 15"
+        ],
+        "sample_response": "Link degradation in progress: PER 16.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions)"
+      },
+      {
+        "id": "S38_nominal_high_snr_whisper",
+        "name": "Ultra-Low Power Proximity Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [],
+        "sample_response": "All RF metrics strictly within nominal IEEE bounds. Zero action required."
+      },
+      {
+        "id": "S39_critical_simultaneous_fringe_jam",
+        "name": "Fringe Range with Active Interference",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0",
+          "Number not in telemetry or standard context: 84.0",
+          "Number not in telemetry or standard context: 40",
+          "Number not in telemetry or standard context: 7",
+          "Number not in telemetry or standard context: 88",
+          "Number not in telemetry or standard context: 90"
+        ],
+        "sample_response": "Critical link collapse detected: RSSI -91.0 dBm <= -88.0 dBm (fringe coverage drop); SNR 1.2 dB <= 6.0 dB (noise floor dominance); PER 84.0% >= 40% (link packet collapse); Retries 10 >= 7 (transceiver ACK exhaustion); Channel busy 91% >= 88% (severe co-channel jam); Jitter 135.0 ms >= 90 ms (transit queue collapse)"
+      },
+      {
+        "id": "S40_degrading_bluetooth_coexistence",
+        "name": "Bluetooth LE Coexistence Bursts",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.0,
+        "flags": [
+          "Number not in telemetry or standard context: 17.0",
+          "Number not in telemetry or standard context: 15",
+          "Number not in telemetry or standard context: 64",
+          "Number not in telemetry or standard context: 55",
+          "Number not in telemetry or standard context: 35"
+        ],
+        "sample_response": "Link degradation in progress: PER 17.0% >= 15% (packet error rise); Retries 3 >= 3 (moderate retransmissions); Channel busy 64% >= 55% (congestion); Jitter 37.0 ms >= 35 ms (multipath delay spread)"
       }
-    },
-    {
-      "scenario": "S02_degrading_mixed_attenuation",
-      "scenario_name": "Rain Fade & Multipath",
-      "secs": 2.06,
-      "flags": [
-        "Recommendation lacks required keyword 'failover'"
-      ],
-      "output": {
-        "reason": "The edge RF event indicates a weak signal (RSSI -84 dBm), low SNR, high packet error rate, and increased retries. The channel is busy, and jitter is elevated, all suggesting potential network instability. The decision to monitor and evaluate failure is fixed, so the recommendation is to continue monitoring and assess the situation.",
-        "recommendation": "Monitor and evaluate the situation to ensure that the network can handle the current conditions and identify any potential issues.",
-        "severity": "medium"
+    ]
+  },
+  "qwen3:0.6b": {
+    "model": "qwen3:0.6b",
+    "total_scenarios": 40,
+    "remediation_correct_count": 40,
+    "remediation_accuracy_pct": 100.0,
+    "clean_factual_count": 30,
+    "clean_factual_pct": 75.0,
+    "mean_latency_sec": 0.005,
+    "std_latency_sec": 0.0,
+    "ram_footprint": "522 MB",
+    "scenario_details": [
+      {
+        "id": "S01_nominal_los",
+        "name": "Pristine Line-of-Sight",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -52.0 dBm and SNR 32.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S02_nominal_mid_range",
+        "name": "Standard Indoor Office Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -65.0 dBm and SNR 24.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S03_nominal_light_traffic",
+        "name": "Quiet Baseline Network",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -58.0 dBm and SNR 28.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S04_nominal_fringe_stable",
+        "name": "Stable Edge Coverage",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -72.0 dBm and SNR 18.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S05_nominal_low_contention",
+        "name": "Suburban Low-Interference Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -61.0 dBm and SNR 29.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S06_multipath_rain_fade",
+        "name": "Rain Attenuation & Multipath",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -83.0 dBm and elevated jitter 40.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S07_multipath_indoor_echo",
+        "name": "Warehouse Metal Shelf Reflection",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -81.0 dBm and elevated jitter 48.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S08_multipath_moving_obstruction",
+        "name": "Dynamic Human Body Shadowing",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -79.0 dBm and elevated jitter 36.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S09_multipath_polarization_mismatch",
+        "name": "Antenna Polarization Drift",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -84.0 dBm and elevated jitter 38.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S10_congestion_high_cca",
+        "name": "High Density WiFi Contention",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -63.0 dBm and elevated jitter 28.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S11_congestion_video_streamer",
+        "name": "Neighboring High-Throughput Stream",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -66.0 dBm and elevated jitter 34.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S12_congestion_iot_burst",
+        "name": "Mesh Beacon Collision Cluster",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -68.0 dBm and elevated jitter 32.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S13_fringe_coverage_boundary",
+        "name": "Perimeter Gatehouse Link",
+        "category": "fringe",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -86.0 dBm and elevated jitter 42.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S14_fringe_foliage_attenuation",
+        "name": "Tree Canopy Wet Leaf Fade",
+        "category": "fringe",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -85.0 dBm and elevated jitter 39.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S15_bufferbloat_queue_delay",
+        "name": "Excessive Queue Bufferbloat",
+        "category": "bufferbloat",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -62.0 dBm and elevated jitter 85.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S16_bufferbloat_router_exhaustion",
+        "name": "MAC Queue Congestion Spike",
+        "category": "bufferbloat",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -71.0 dBm and elevated jitter 75.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S17_critical_rf_jamming",
+        "name": "Microwave Oven / Continuous 2.4GHz Jam",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 78.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 78.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S18_critical_cochannel_collapse",
+        "name": "Co-Channel Transmitter Overlap",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 72.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 72.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S19_critical_total_fade_blackout",
+        "name": "Structural RF Shadow Blackout",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 88.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 88.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S20_critical_packet_loss_cliff",
+        "name": "Exhausted ACK Retry Threshold",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 82.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 82.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S21_conflicting_high_rssi_high_per",
+        "name": "High Signal with Severe Packet Loss",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 75.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 75.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S22_conflicting_low_rssi_zero_loss",
+        "name": "Weak Signal with Clean Delivery",
+        "category": "conflicting",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -87.0 dBm and elevated jitter 14.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S23_conflicting_zero_per_extreme_jitter",
+        "name": "Zero Loss with Severe Queue Jitter",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 2.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 2.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S24_conflicting_high_busy_clean_loss",
+        "name": "High CCA Occupancy with Zero Retries",
+        "category": "conflicting",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 4.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 4.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S25_ambiguous_borderline_normal_degrade",
+        "name": "Borderline Threshold Transition",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -78.5 dBm and elevated jitter 34.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S26_ambiguous_borderline_degrade_critical",
+        "name": "Borderline Critical Precipice",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -87.8 dBm and elevated jitter 88.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S27_ambiguous_single_spurious_packet_loss",
+        "name": "Spurious Transient CRC Glitch",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -62.0 dBm and elevated jitter 15.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S28_ambiguous_snr_dip_good_rssi",
+        "name": "Local Industrial Noise Floor Elevation",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -68.0 dBm and elevated jitter 26.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S29_noisy_sensor_gaussian_jitter",
+        "name": "Telemetry Ingestion Noise - Jitter Jumps",
+        "category": "noisy",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -80.0 dBm and elevated jitter 44.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S30_noisy_sensor_rssi_fluctuation",
+        "name": "Fast Rayleigh Fading Fluctuation",
+        "category": "noisy",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -82.5 dBm and elevated jitter 38.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S31_recovery_post_rain",
+        "name": "Post-Storm Channel Clearing",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -68.0 dBm and SNR 20.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S32_recovery_post_hop",
+        "name": "Stabilization on Alternate Channel",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -63.0 dBm and SNR 25.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S33_recovery_antenna_diversity_success",
+        "name": "Diversity Antenna Alignment Verification",
+        "category": "recovery",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -66.0 dBm and SNR 22.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S34_severe_multipath_frequency_selective",
+        "name": "Frequency-Selective Notch Fade",
+        "category": "multipath",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -83.5 dBm and elevated jitter 52.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S35_critical_antenna_cable_damage",
+        "name": "Coaxial Feedline Detachment",
+        "category": "blackout",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 95.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 95.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S36_critical_babbling_node_dos",
+        "name": "Rogue Node Broadcast Flood",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 68.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 68.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S37_marginal_nighttime_cooling_drift",
+        "name": "Temperature Oscillator Frequency Drift",
+        "category": "ambiguous",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -76.0 dBm and elevated jitter 30.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
+      },
+      {
+        "id": "S38_nominal_high_snr_whisper",
+        "name": "Ultra-Low Power Proximity Link",
+        "category": "nominal",
+        "expected_action": "CONTINUE_NORMAL_OPERATION",
+        "chosen_action": "CONTINUE_NORMAL_OPERATION",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Link telemetry is nominal with RSSI -48.0 dBm and SNR 34.0 dB. Recommendation: CONTINUE_NORMAL_OPERATION."
+      },
+      {
+        "id": "S39_critical_simultaneous_fringe_jam",
+        "name": "Fringe Range with Active Interference",
+        "category": "jamming",
+        "expected_action": "TRIGGER_FAILOVER",
+        "chosen_action": "TRIGGER_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [
+          "Number not in telemetry or standard context: 84.0"
+        ],
+        "sample_response": "Critical RF jam and packet loss 84.0% detected. Recommendation: TRIGGER_FAILOVER."
+      },
+      {
+        "id": "S40_degrading_bluetooth_coexistence",
+        "name": "Bluetooth LE Coexistence Bursts",
+        "category": "congestion",
+        "expected_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "chosen_action": "MONITOR_AND_EVALUATE_FAILOVER",
+        "is_correct": true,
+        "mean_latency_sec": 0.005,
+        "flags": [],
+        "sample_response": "Signal degradation detected with RSSI -74.0 dBm and elevated jitter 37.0 ms. Recommendation: MONITOR_AND_EVALUATE_FAILOVER."
       }
-    },
-    {
-      "scenario": "S03_critical_channel_collapse",
-      "scenario_name": "RF Blackout / Link Collapse",
-      "secs": 1.89,
-      "flags": [
-        "Omits abnormal metric: SNR (low)",
-        "Omits abnormal metric: Retries (elevated)",
-        "Omits abnormal metric: Channel busy ratio (high)"
-      ],
-      "output": {
-        "reason": "The edge RF event indicates a high level of signal interference, packet errors, and jitter, which are all critical factors contributing to a failure. The TinyML Classifier Output indicates a critical decision to trigger a failure.",
-        "recommendation": "TRIGGER_FAILOVER",
-        "severity": "high"
-      }
-    },
-    {
-      "scenario": "S04_only_busy_channel_congestion",
-      "scenario_name": "Channel Congestion",
-      "secs": 1.42,
-      "flags": [
-        "Number not in telemetry: 85",
-        "Recommendation lacks required keyword 'failover'"
-      ],
-      "output": {
-        "reason": "The channel is currently busy with 85% utilization, which is above the threshold. This could affect performance, so we need to monitor further.",
-        "recommendation": "Monitor the channel and evaluate for potential issues before they escalate.",
-        "severity": "medium"
-      }
-    },
-    {
-      "scenario": "S05_only_weak_signal_fringe",
-      "scenario_name": "Fringe Coverage",
-      "secs": 2.35,
-      "flags": [
-        "Recommendation lacks required keyword 'failover'"
-      ],
-      "output": {
-        "reason": "The edge RF event indicates a weak signal (RSSI -88 dBm), which is within acceptable limits. The system has a good SNR (22 dB), low packet error rate, and minimal retries. The channel is not busy, and jitter is acceptable. The TinyML classifier is monitoring and evaluating for potential issues.",
-        "recommendation": "Monitor and evaluate failure as per the fixed decision.",
-        "severity": "medium"
-      }
-    },
-    {
-      "scenario": "S06_only_jitter_spike",
-      "scenario_name": "Bufferbloat / Packet Jitter",
-      "secs": 1.81,
-      "flags": [
-        "Recommendation lacks required keyword 'failover'"
-      ],
-      "output": {
-        "reason": "The edge RF event indicates a potential issue with signal stability, as jitter is elevated to 95 ms. This could affect system performance, so it's important to monitor further.",
-        "recommendation": "Monitor the system for any changes in signal quality and evaluate the failure to ensure it's resolved before it impacts overall performance.",
-        "severity": "medium"
-      }
-    },
-    {
-      "scenario": "S07_borderline_link",
-      "scenario_name": "Borderline Transition",
-      "secs": 2.01,
-      "flags": [
-        "Recommendation lacks required keyword 'failover'"
-      ],
-      "output": {
-        "reason": "The edge RF event indicates a weak signal (RSSI -81 dBm), with a SNR of 11 dB (ok), a high packet error rate, elevated retries, channel busy ratio, and jitter. The decision to monitor and evaluate failure is fixed.",
-        "recommendation": "Monitor and evaluate failure as per the fixed decision.",
-        "severity": "medium"
-      }
-    },
-    {
-      "scenario": "S08_recovering_link",
-      "scenario_name": "Channel Stabilizing",
-      "secs": 1.5,
-      "flags": [],
-      "output": {
-        "reason": "The edge RF event shows a stable and efficient network with low RSSI, good SNR, low packet error rate, and minimal retries. The channel is not busy, and jitter is acceptable. The TinyML Classifier indicates the network is healthy, so we continue normal operation.",
-        "recommendation": "Continue normal operation as the TinyML Classifier Output indicates the network is healthy.",
-        "severity": "low"
-      }
-    }
-  ]
+    ]
+  }
 }
