@@ -4,11 +4,11 @@ Runs on: Arduino UNO Q (Linux Application Processor)
 
 Purpose:
 A deterministic, rule-governed safety layer. While open-weight LLMs (Qwen/SmolLM)
-provide causal explanations, Laya enforces absolute safety invariant rules.
+provide causal explanations and triage suggestions, Laya enforces absolute safety invariant rules.
 No model recommendation can bypass these deterministic bounds.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 class LayaSafetyEngine:
     # Strict Network Operational Utility Limits (NOULs)
@@ -23,7 +23,7 @@ class LayaSafetyEngine:
     JITTER_DEGRADING = 35.0  # ms
     JITTER_CRITICAL = 90.0   # ms
 
-    # Allowed Actions
+    # Allowed Deterministic Actions
     ACTION_CONTINUE = "CONTINUE_NORMAL_OPERATION"
     ACTION_ANTENNA_SWITCH = "SWITCH_DIVERSITY_ANTENNA"
     ACTION_TRIGGER_FAILOVER = "TRIGGER_CHANNEL_FAILOVER"
@@ -44,7 +44,7 @@ class LayaSafetyEngine:
         jitter = float(telemetry.get("jitter", 10.0))
         tinyml_class = telemetry.get("tinyml_class", "NORMAL")
 
-        # 1. Deterministic Rule Assessment
+        # 1. Deterministic Rule Assessment against NOULs
         critical_flags = []
         degrading_flags = []
 
@@ -109,3 +109,91 @@ class LayaSafetyEngine:
         }
         self.audit_log.append(audit_entry)
         return audit_entry
+
+    def evaluate_dual_model(
+        self,
+        telemetry: Dict[str, Any],
+        smollm_output: Optional[Dict[str, Any]] = None,
+        qwen_output: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Evaluates physical telemetry alongside Tier 1 (SmolLM 135M) and Tier 2 (Qwen 0.6B).
+        Performs multi-model consensus verification and enforces deterministic NOULs arbitration.
+        """
+        # Step 1: Compute Ground-Truth Deterministic Decision
+        base_decision = self.evaluate(telemetry)
+        state = base_decision["state"]
+        binding_action = base_decision["action"]
+        physics_reason = base_decision["reason"]
+
+        smollm_validated = True
+        smollm_override = None
+        smollm_action = smollm_output.get("proposed_action", "") if smollm_output else ""
+        smollm_text = smollm_output.get("raw_text", "") if smollm_output else ""
+
+        qwen_validated = True
+        qwen_override = None
+        qwen_action = qwen_output.get("proposed_action", "") if qwen_output else ""
+        qwen_content = qwen_output.get("content", "") if qwen_output else ""
+        qwen_thinking = qwen_output.get("thinking", "") if qwen_output else ""
+
+        # Step 2: Validate Tier 1 (SmolLM Triage)
+        if smollm_output:
+            smollm_clean = (smollm_action + " " + smollm_text).lower()
+            if state == "CRITICAL" and "failover" not in smollm_clean and "hop" not in smollm_clean and "rerout" not in smollm_clean:
+                smollm_validated = False
+                smollm_override = "SmolLM missed critical collapse threshold. Overridden by Laya."
+            elif state == "NORMAL" and ("failover" in smollm_clean or "alarm" in smollm_clean or "rerout" in smollm_clean):
+                smollm_validated = False
+                smollm_override = "SmolLM suggested false-alarm reroute on healthy link. Overridden by Laya."
+
+        # Step 3: Validate Tier 2 (Qwen Causal Reasoner)
+        if qwen_output:
+            qwen_clean = (qwen_action + " " + qwen_content).lower()
+            if state == "CRITICAL" and "failover" not in qwen_clean and "hop" not in qwen_clean:
+                qwen_validated = False
+                qwen_override = "Qwen did not mandate emergency channel hop under severe jamming. Overridden by Laya."
+            elif state == "NORMAL" and ("failover" in qwen_clean or "hop" in qwen_clean or "jamming" in qwen_clean):
+                qwen_validated = False
+                qwen_override = "Qwen hallucinated channel collision on nominal link. Overridden by Laya."
+
+        # Step 4: Determine Multi-Tier Consensus
+        if smollm_validated and qwen_validated:
+            consensus_mode = "UNANIMOUS_CONSENSUS"
+            consensus_badge = "100% UNANIMOUS"
+        elif smollm_validated or qwen_validated:
+            consensus_mode = "PARTIAL_CONSENSUS"
+            consensus_badge = "HYBRID_RESOLVED"
+        else:
+            consensus_mode = "NOUL_OVERRULED"
+            consensus_badge = "HARD_OVERRIDE"
+
+        # Step 5: Synthesize Unified Causal Explanation
+        causal_explanation = qwen_content if qwen_content else physics_reason
+        if smollm_text and "diagnosing" in smollm_text.lower():
+            triage_note = f"SmolLM triage: {smollm_text}"
+        else:
+            triage_note = f"SmolLM triage: {smollm_action}"
+
+        return {
+            "state": state,
+            "action": binding_action,
+            "physics_reason": physics_reason,
+            "consensus_mode": consensus_mode,
+            "consensus_badge": consensus_badge,
+            "smollm_audit": {
+                "validated": smollm_validated,
+                "override": smollm_override,
+                "action": smollm_action,
+                "latency_sec": smollm_output.get("latency_sec", 0.0) if smollm_output else 0.0
+            },
+            "qwen_audit": {
+                "validated": qwen_validated,
+                "override": qwen_override,
+                "action": qwen_action,
+                "thinking_preview": qwen_thinking[:80] + "..." if qwen_thinking else "",
+                "latency_sec": qwen_output.get("latency_sec", 0.0) if qwen_output else 0.0
+            },
+            "causal_explanation": causal_explanation,
+            "binding_authority": "LAYA_SYSTEM_1_NOULS"
+        }

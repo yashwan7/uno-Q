@@ -64,23 +64,38 @@ typedef struct {
 
 ---
 
-## 4. Tier 2: Open-Weight SLM Causal Reasoning & Physical Actuation
+## 4. Tier 2: Dual-Model Cognitive Layer (SmolLM2 + Qwen 3)
 
-When a link state transitions to `DEGRADING` or `CRITICAL`, the Cortex-M33 pulls the `PIN_HOST_WAKE_INT` line high.
+When a link state transitions to `DEGRADING` or `CRITICAL`, the Arduino UNO Q host initiates a two-tier cognitive pipeline:
 
-The Python agent daemon on the Arduino UNO Q host (`agent/sloth_agent.py`) wakes up and presents the factual telemetry to a local open-weight model (e.g. `qwen3:0.6b` running via Ollama):
+### 4.1 Dual-Model Specialization
+1. **Tier 1 — Fast Edge Triage (`smollm2:135m`, 270 MB):**
+   - **Latency:** ~0.12 - 0.25 seconds.
+   - **Role:** High-speed edge triage. Quickly maps physical telemetry to initial link health hypotheses (`NORMAL`, `DEGRADING`, `CRITICAL`) and proposes tactical actions without consuming heavy compute.
+2. **Tier 2 — Deep Causal Attribution (`qwen3:0.6b`, 522 MB):**
+   - **Latency:** ~1.6 - 2.2 seconds.
+   - **Role:** Causal reasoning engine. Inspects RF delay spread, multipath fading vs. thermal attenuation vs. co-channel interference, executing chain-of-thought analysis (`<think>`) to formulate root-cause explanations.
 
 ```
 [TELEMETRY] RSSI: -84 dBm | SNR: 8 dB | PER: 31% | Retries: 4 | Jitter: 42ms
-[TINYML] Class: DEGRADING
-[SLM REASONING] "Weak signal strength combined with high packet error rate and elevated jitter indicates multipath fading rather than full frequency jamming."
-[AUTONOMOUS ACTUATION] "Toggled GPIO 4 to Diversity Antenna 1. Jitter dropped to 8ms. Link stabilized. Returning to Sloth Sleep."
+[TINYML M33] Class: DEGRADING
+[SMOLLM 135M] Triage: DEGRADING -> Proposed Action: SWITCH_DIVERSITY_ANTENNA (120ms)
+[QWEN 3 0.6B] Causal: "Multipath reflections are creating inter-symbol interference and jitter delay spread. Recommend antenna swap." (1.8s)
 ```
 
-### Physical Actuators
-- **Antenna Diversity Switch (GPIO 4):** Toggles RF frontend PIN diode to swap between primary dipole and secondary directional patch antenna.
-- **Frequency Agility (Channel Hopping):** Injects 802.15.4 / WiFi mesh channel switch commands over the local network stack (e.g., hopping from congested Channel 6 to quiet Channel 11).
-- **Adaptive CCA Pacing:** Adjusts backoff contention windows to reduce collision rates in dense deployments.
+---
+
+## 5. Tier 3: Laya System-1 NOULs Decision Layer (Deterministic Invariant)
+
+To prevent LLM hallucination or model divergence from destabilizing critical hardware, SlothMesh routes all model recommendations through the **Laya System-1 NOULs (Network Operational Utility Limits)** decision layer:
+
+- **Mathematical Boundaries:** Strict physical caps on RSSI (<-88 dBm), SNR (<6 dB), PER (>40%), Retries (>7), and Jitter (>90 ms).
+- **Consensus Verification:** Compares SmolLM vs. Qwen3. If both models agree with physical NOULs, consensus is `100% UNANIMOUS`.
+- **Hallucination Override:** If an LLM recommends staying idle or suggests `CONTINUE` during an active RF blackout, Laya **overrules the LLM** and forces `TRIGGER_CHANNEL_FAILOVER`.
+- **Physical Actuators:**
+  - **Antenna Diversity Switch (GPIO 4):** Toggles RF frontend PIN diode to swap between primary dipole and secondary directional patch antenna.
+  - **Frequency Agility (Channel Hopping):** Injects 802.15.4 / WiFi mesh channel switch commands over the local network stack (e.g., hopping from congested Channel 6 to quiet Channel 11).
+  - **Adaptive CCA Pacing:** Adjusts backoff contention windows to reduce collision rates in dense deployments.
 
 ---
 

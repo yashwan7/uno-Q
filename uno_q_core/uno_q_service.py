@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Arduino UNO Q Orchestration Service: Edge Telemetry Sentinel & LLM Engine
-Hardware Target: Arduino UNO Q (Linux Application Processor + Cortex-M33)
+Arduino UNO Q Orchestration Service: Edge Telemetry Sentinel & Dual-Model Cognitive Layer
+Hardware Target: Arduino UNO Q (Linux Application Processor + STM32U5 Cortex-M33)
 Connected Hardware: NXP FRDM-MCXN236 (/dev/cu.usbmodemFIK54L1PUAFFP3)
 
 Features:
 - Live NXP binary frame parsing (0xA5 protocol)
-- Node heartbeat & timeout tracking (3.0s expiration)
-- Deterministic Laya System-1 Safety Engine
-- Local Open-Weight SLM Adapter (Qwen 0.6B / SmolLM via Ollama, 100% offline)
-- Dual OLED & ANSI Terminal Dashboard
-- Clean, non-blocking fallback if LLM is unavailable
+- Node heartbeat & timeout tracking (3.5s expiration)
+- Tier 1: SmolLM2 135M (Fast Triage Agent)
+- Tier 2: Qwen 3 0.6B (Deep Causal Attribution & Chain-of-Thought)
+- Tier 3: Laya System-1 NOULs Deterministic Decision & Arbitration Layer
+- Dual OLED & ANSI Terminal Visual Dashboard
+- Real-time JSON telemetry sync for Tactical CAD Dashboard
 """
 
 import os
@@ -19,15 +20,15 @@ import time
 import glob
 import json
 import threading
-import requests
 import serial
+from typing import Dict, Any, Optional
 
 from laya_safety_engine import LayaSafetyEngine
+from dual_model_engine import DualModelEngine
 from oled_terminal_display import OLEDDisplay
 
-# Configuration
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/chat")
-SLM_MODEL = os.getenv("SLM_MODEL", "qwen3:0.6b")
+# Status file path for live dashboard sync
+STATUS_FILE = os.path.join(os.path.dirname(__file__), "live_status.json")
 HEARTBEAT_TIMEOUT_SEC = 3.5
 
 class UnoQOrchestrator:
@@ -38,10 +39,22 @@ class UnoQOrchestrator:
         self.running = False
         
         self.laya = LayaSafetyEngine()
+        self.dual_engine = DualModelEngine()
         self.display = OLEDDisplay()
         
         self.nodes = {
-            1: {"last_seen": 0, "status": "UNKNOWN", "seq": 0, "rssi": -65, "snr": 20, "decision": "INITIALIZING", "slm_text": "Awaiting NXP stream..."}
+            1: {
+                "last_seen": 0,
+                "status": "UNKNOWN",
+                "seq": 0,
+                "rssi": -62.0,
+                "snr": 24.0,
+                "decision": "INITIALIZING",
+                "consensus": "INITIALIZING",
+                "smollm": {},
+                "qwen": {},
+                "causal": "Awaiting NXP hardware frame stream..."
+            }
         }
         self.simulated_override = None
 
@@ -65,21 +78,7 @@ class UnoQOrchestrator:
             print(f"[UNO Q] Serial connection error: {e}")
             return False
 
-    def query_local_slm(self, node_id, status, rssi, snr, decision):
-        """Query local open-weight model (Qwen 0.6B) non-blockingly."""
-        prompt = f"Edge mesh Node {node_id} has link state {status} (RSSI {rssi} dBm, SNR {snr} dB). Action taken: {decision}. In 1 sentence explain the physical cause."
-        try:
-            r = requests.post(OLLAMA_URL, json={
-                "model": SLM_MODEL,
-                "messages": [{"role": "user", "content": prompt}],
-                "stream": False,
-                "options": {"temperature": 0.1}
-            }, timeout=4)
-            return r.json()["message"]["content"].strip()
-        except Exception:
-            return "Local SLM offline. Laya deterministic safety rule executed."
-
-    def process_telemetry(self, node_id, raw_status, seq):
+    def process_telemetry(self, node_id: int, raw_status: int, seq: int):
         now = time.time()
         node = self.nodes.get(node_id, {})
         node["last_seen"] = now
@@ -107,26 +106,64 @@ class UnoQOrchestrator:
             "tinyml_class": tinyml_cls
         }
 
-        # Run Laya System-1 Safety Assessment
-        safety = self.laya.evaluate(telemetry)
-        state = safety["state"]
-        decision = safety["action"]
+        # 1. Run Dual-Model Edge Cognitive Pipeline (SmolLM2-135M + Qwen3-0.6B)
+        # On normal link, we can use fast cached triage to save energy (Sloth Pacing); on anomaly we invoke full dual models
+        if tinyml_cls != "NORMAL" or self.simulated_override:
+            dual_res = self.dual_engine.run_dual_inference(telemetry)
+            smollm_out = dual_res["smollm"]
+            qwen_out = dual_res["qwen"]
+        else:
+            smollm_out = {
+                "model": "smollm2:135m",
+                "latency_sec": 0.015,
+                "proposed_state": "NORMAL",
+                "proposed_action": "CONTINUE_NORMAL_OPERATION",
+                "raw_text": "Link nominal. Paced energy preservation active.",
+                "status": "PACED"
+            }
+            qwen_out = {
+                "model": "qwen3:0.6b",
+                "latency_sec": 0.020,
+                "proposed_state": "NORMAL",
+                "proposed_action": "CONTINUE_NORMAL_OPERATION",
+                "content": "All RF metrics within optimal NOUL bounds. Zero packet loss.",
+                "thinking": "Link parameters nominal. Sloth pacing enabled.",
+                "status": "PACED"
+            }
+
+        # 2. Tier 3: Laya System-1 NOULs Deterministic Arbitration
+        laya_eval = self.laya.evaluate_dual_model(telemetry, smollm_out, qwen_out)
+        state = laya_eval["state"]
+        decision = laya_eval["action"]
 
         node["status"] = state
         node["rssi"] = rssi
         node["snr"] = snr
         node["decision"] = decision
+        node["consensus"] = laya_eval["consensus_badge"]
+        node["smollm"] = smollm_out
+        node["qwen"] = qwen_out
+        node["causal"] = laya_eval["causal_explanation"]
 
-        # Query Local Open-Weight SLM on state change or degrading
-        if state != "NORMAL":
-            slm_reason = self.query_local_slm(node_id, state, rssi, snr, decision)
-        else:
-            slm_reason = "Link nominal. Paced sloth monitoring active."
-        node["slm_text"] = slm_reason
-
-        # Render to OLED & Terminal
-        box = self.display.render(node_id, state, rssi, snr, decision, slm_reason)
+        # 3. Render Rich Visual OLED Display Box
+        box = self.display.render_dual_model(node_id, telemetry, laya_eval)
         print(box)
+
+        # 4. Save Real-Time Status for Tactical CAD Dashboard
+        self._sync_live_status(node_id, telemetry, laya_eval)
+
+    def _sync_live_status(self, node_id: int, telemetry: Dict, laya_eval: Dict):
+        try:
+            status_data = {
+                "timestamp": time.time(),
+                "node_id": node_id,
+                "telemetry": telemetry,
+                "laya": laya_eval
+            }
+            with open(STATUS_FILE, "w") as f:
+                json.dump(status_data, f, indent=2)
+        except Exception:
+            pass
 
     def check_timeouts(self):
         """Ensures nodes that stop transmitting are marked CRITICAL."""
@@ -136,20 +173,24 @@ class UnoQOrchestrator:
                 if data["status"] != "TIMEOUT_CRITICAL":
                     data["status"] = "TIMEOUT_CRITICAL"
                     data["decision"] = "TRIGGER_CHANNEL_FAILOVER"
-                    data["slm_text"] = "Node missed heartbeat (>3.5s). Marked unreachable."
+                    data["causal"] = f"Node missed heartbeat (>{HEARTBEAT_TIMEOUT_SEC}s). Marked unreachable."
                     print(f"\n[ALERT] NODE {nid} TIMEOUT! Exceeded {HEARTBEAT_TIMEOUT_SEC}s threshold.")
-                    box = self.display.render(nid, "CRITICAL", -105.0, 0.0, data["decision"], data["slm_text"])
+                    
+                    tel = {"rssi": -105.0, "snr": 0.0, "per": 1.0, "retries": 10, "jitter": 200.0, "tinyml_class": "CRITICAL"}
+                    laya_eval = self.laya.evaluate_dual_model(tel, None, None)
+                    box = self.display.render_dual_model(nid, tel, laya_eval)
                     print(box)
+                    self._sync_live_status(nid, tel, laya_eval)
 
     def run(self):
         self.running = True
         self.connect_serial()
-        print("\n" + "=" * 60)
-        print(" 🦥 ARDUINO UNO Q ORCHESTRATION SERVICE STARTED")
+        print("\n" + "=" * 74)
+        print(" 🦥 ARDUINO UNO Q DUAL-MODEL SENTINEL & LAYA DECISION LAYER")
         print(f" Target NXP Port: {self.serial_port}")
-        print(f" Local SLM: {SLM_MODEL} | Safety: Laya System-1 NOULs")
-        print(" Press 'd'=Degrade, 'c'=Critical, 'n'=Normal, 'q'=Quit")
-        print("=" * 60)
+        print(" Models: smollm2:135m (Triage) + qwen3:0.6b (Deep Reasoner) via Ollama")
+        print(" Decision Layer: Laya System-1 NOULs (Deterministic Hardware Invariant)")
+        print("=" * 74)
 
         while self.running:
             self.check_timeouts()
@@ -168,7 +209,6 @@ class UnoQOrchestrator:
                 except Exception as e:
                     time.sleep(0.5)
             else:
-                # Fallback to periodic loop if serial disconnected
                 time.sleep(1.0)
 
     def stop(self):

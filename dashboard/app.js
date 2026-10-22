@@ -187,30 +187,48 @@ function injectScenario(type) {
 
   if (type === "normal") {
     document.querySelectorAll(".tactical-btn")[0].classList.add("active");
-    updateUI("NORMAL", -62.0, 24.0, 1.0, 0, 18, 6.0, "CONTINUE_NORMAL_OPERATION", "All metrics within optimal NOUL bounds. Zero packet loss.", true);
+    updateUI("NORMAL", -62.0, 24.0, 1.0, 0, 18, 6.0, "CONTINUE_NORMAL_OPERATION", "All metrics within optimal NOUL bounds. Zero packet loss.", true,
+      { latency: "0.08s · VALID", action: "CONTINUE_NORMAL_OPERATION", status: "VALID" },
+      { latency: "1.82s · CoT VALID", causal: "All RF metrics nominal. Paced energy preservation active." },
+      "100% UNANIMOUS"
+    );
     drawMeshLinks("NORMAL");
     addLog(`[${now}] 🌞 Scenario: Quiet Sunshine nominal link restored across Sir MVIT campus.`, "normal");
   } else if (type === "degrading") {
     document.querySelectorAll(".tactical-btn")[1].classList.add("active");
-    updateUI("DEGRADING", -82.0, 9.0, 28.0, 4, 62, 38.0, "SWITCH_DIVERSITY_ANTENNA", "Multipath fading & 38ms jitter detected by M33. Toggled diversity antenna pin (GPIO 4).", true);
+    updateUI("DEGRADING", -82.0, 9.0, 28.0, 4, 62, 38.0, "SWITCH_DIVERSITY_ANTENNA", "Multipath fading & 38ms jitter detected by M33. Toggled diversity antenna pin (GPIO 4).", true,
+      { latency: "0.14s · VALID", action: "SWITCH_DIVERSITY_ANTENNA", status: "VALID" },
+      { latency: "1.95s · CoT VALID", causal: "Multipath fading & delay spread at Sir MVIT perimeter resolved by antenna diversity." },
+      "100% UNANIMOUS"
+    );
     drawMeshLinks("DEGRADING");
     addLog(`[${now}] 🌧️ Scenario: Rain Fade / Jitter spike detected. Laya switched diversity antenna.`, "warning");
-    addLog(`[${now}] 🧠 Qwen 0.6B: Signal attenuation at Sir MVIT perimeter resolved by antenna diversity.`, "info");
+    addLog(`[${now}] ⚡ SmolLM2 135M [0.14s]: Rapid triage classified link as DEGRADING.`, "info");
+    addLog(`[${now}] 🧠 Qwen3 0.6B [1.95s]: Physical cause verified as multipath ground reflections.`, "info");
   } else if (type === "critical") {
     document.querySelectorAll(".tactical-btn")[2].classList.add("active");
-    updateUI("CRITICAL", -95.0, 2.0, 74.0, 9, 91, 120.0, "TRIGGER_CHANNEL_FAILOVER", "Severe RF jamming & 74% packet collapse. Laya executed emergency channel hop (Ch 6 -> 11).", true);
+    updateUI("CRITICAL", -95.0, 2.0, 74.0, 9, 91, 120.0, "TRIGGER_CHANNEL_FAILOVER", "Severe RF jamming & 74% packet collapse. Laya executed emergency channel hop (Ch 6 -> 11).", false,
+      { latency: "0.11s · OVERRULED", action: "CONTINUE_NORMAL (OVERRULED)", status: "OVERRULED" },
+      { latency: "1.78s · CoT VALID", causal: "Co-channel interference collapse confirmed. Channel shifted to 11." },
+      "HARD_OVERRIDE"
+    );
     drawMeshLinks("CRITICAL");
-    addLog(`[${now}] ⚡ Scenario: RF Jamming / Link Collapse. Laya triggered immediate frequency hop.`, "critical");
-    addLog(`[${now}] 🧠 Qwen 0.6B: Co-channel interference collapse confirmed. Channel shifted to 11.`, "info");
+    addLog(`[${now}] ⚡ Scenario: RF Jamming / Link Collapse detected at Gate 1.`, "critical");
+    addLog(`[${now}] ⚠️ SmolLM proposed CONTINUE -> OVERRULED by Laya System-1 NOULs.`, "warning");
+    addLog(`[${now}] 🛡️ Laya executed binding emergency Channel Hop (Ch 6 -> 11).`, "critical");
   } else if (type === "timeout") {
     document.querySelectorAll(".tactical-btn")[3].classList.add("active");
-    updateUI("TIMEOUT_CRITICAL", -105.0, 0.0, 100.0, 12, 100, 200.0, "MARK_NODE_UNREACHABLE", "Node-01 missed heartbeat (>3.5s). Marked unreachable by UNO Q sentinel.", true);
+    updateUI("TIMEOUT_CRITICAL", -105.0, 0.0, 100.0, 12, 100, 200.0, "TRIGGER_CHANNEL_FAILOVER", "Node-01 missed heartbeat (>3.5s). Marked unreachable by UNO Q sentinel.", true,
+      { latency: "0.05s · TIMEOUT", action: "TRIGGER_FAILOVER", status: "VALID" },
+      { latency: "1.45s · TIMEOUT", causal: "Transceiver silence exceeded 3.5s safety threshold." },
+      "NOUL_OVERRIDE"
+    );
     drawMeshLinks("CRITICAL");
     addLog(`[${now}] 🚨 ALERT: Node-01 heartbeat timeout exceeded (3.5s) at Gate 1 Tower!`, "critical");
   }
 }
 
-function updateUI(status, rssi, snr, per, retries, busy, jitter, action, cause, llmValid) {
+function updateUI(status, rssi, snr, per, retries, busy, jitter, action, cause, llmValid, smollm, qwen, consensus) {
   // KPI Header
   const kpi1 = document.getElementById("kpiNode1Status");
   kpi1.textContent = status;
@@ -232,10 +250,38 @@ function updateUI(status, rssi, snr, per, retries, busy, jitter, action, cause, 
   document.getElementById("badgeRssi").className = `m-badge ${badgeClass}`;
   document.getElementById("badgeRssi").textContent = rssi > -75 ? "NOMINAL" : rssi > -88 ? "DEGRADED" : "CRITICAL";
 
+  // Dual-Model Elements
+  if (smollm) {
+    const smLat = document.getElementById("dispSmollmLatency");
+    if (smLat) {
+      smLat.textContent = smollm.latency;
+      smLat.className = `m-badge ${smollm.status === "VALID" ? "badge-normal" : "badge-critical"}`;
+    }
+    const smAct = document.getElementById("dispSmollmAction");
+    if (smAct) smAct.textContent = smollm.action;
+  }
+
+  if (qwen) {
+    const qwLat = document.getElementById("dispQwenLatency");
+    if (qwLat) qwLat.textContent = qwen.latency;
+    const qwCau = document.getElementById("dispQwenCausal");
+    if (qwCau) qwCau.textContent = qwen.causal;
+  }
+
+  const consBadge = document.getElementById("auditConsensusBadge");
+  if (consBadge && consensus) {
+    consBadge.textContent = consensus;
+    consBadge.style.color = consensus.includes("UNANIMOUS") ? "var(--accent-green)" : consensus.includes("HARD") ? "var(--accent-red)" : "var(--accent-yellow)";
+  }
+
   // Audit Box
-  document.getElementById("auditAction").textContent = action;
-  document.getElementById("auditCause").textContent = cause;
-  document.getElementById("auditLlmValid").textContent = llmValid ? "PASSED (NOULs VALIDATED)" : "OVERRIDDEN BY LAYA";
+  const auditAct = document.getElementById("auditAction");
+  if (auditAct) {
+    auditAct.textContent = action;
+    auditAct.className = `a-val ${status === "NORMAL" ? "green-text" : status === "DEGRADING" ? "yellow-text" : "red-text"}`;
+  }
+  const auditC = document.getElementById("auditCause");
+  if (auditC) auditC.textContent = cause;
 }
 
 function addLog(msg, type) {

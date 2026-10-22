@@ -187,24 +187,37 @@
         </div>
       </div>
 
-      <!-- Laya Safety & Decision Audit -->
+      <!-- Dual-Model AI & Laya Decision Layer HUD Panel -->
       <div class="hud-panel">
         <div class="panel-header">
-          <span>🛡️ LAYA SYSTEM-1 SAFETY DECISION AUDIT</span>
-          <span class="panel-header-right">STRICT INVARIANT</span>
+          <span>🧠 DUAL-MODEL AI & LAYA DECISION LAYER</span>
+          <span class="panel-header-right" id="auditConsensusBadge" style="color:var(--accent-green);font-weight:700;">100% UNANIMOUS</span>
         </div>
         <div class="audit-box">
-          <div class="audit-row">
-            <span class="a-label">ENFORCED ACTION:</span>
-            <span class="a-val cyan-text" id="auditAction">CONTINUE_NORMAL_OPERATION</span>
+          <!-- Tier 1: SmolLM2 135M Fast Triage -->
+          <div class="audit-row" style="border-bottom:1px dashed rgba(255,255,255,0.08); padding-bottom:6px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="a-label">⚡ TIER 1 // FAST TRIAGE (smollm2:135m):</span>
+              <span class="m-badge badge-normal" id="dispSmollmLatency">0.12s · VALID</span>
+            </div>
+            <span class="a-val" id="dispSmollmAction" style="color:#00f0ff;">CONTINUE_NORMAL_OPERATION</span>
           </div>
-          <div class="audit-row">
-            <span class="a-label">DETERMINISTIC CAUSE:</span>
-            <span class="a-val" id="auditCause">All metrics within optimal NOUL bounds. Zero packet loss.</span>
+
+          <!-- Tier 2: Qwen 3 0.6B Deep Causal Reasoner -->
+          <div class="audit-row" style="border-bottom:1px dashed rgba(255,255,255,0.08); padding-bottom:6px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="a-label">🧠 TIER 2 // DEEP CAUSAL REASONER (qwen3:0.6b):</span>
+              <span class="m-badge badge-normal" id="dispQwenLatency">1.84s · CoT VALID</span>
+            </div>
+            <span class="a-val" id="dispQwenCausal" style="color:#e0e6ed; font-size:0.74rem;">All RF metrics within optimal NOUL bounds. Zero packet loss.</span>
           </div>
+
+          <!-- Tier 3: Laya System-1 Invariant -->
           <div class="audit-row">
-            <span class="a-label">LLM VALIDATION:</span>
-            <span class="a-val green-text" id="auditLlmValid">PASSED (CONSISTENT WITH PHYSICAL FACTS)</span>
+            <span class="a-label">🛡️ TIER 3 // BINDING HARDWARE ACTUATION (LAYA NOULs):</span>
+            <span class="a-val green-text" id="auditAction" style="font-size:0.85rem; font-weight:800;">CONTINUE_NORMAL_OPERATION</span>
+            <span class="a-label" style="margin-top:4px;">PHYSICAL BASIS:</span>
+            <span class="a-val" id="auditCause" style="font-size:0.72rem; color:var(--text-muted);">Telemetry strictly nominal. All metrics within optimal NOUL bounds.</span>
           </div>
         </div>
       </div>
