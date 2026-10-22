@@ -1,0 +1,123 @@
+{
+  "dataset": {
+    "source": "Synthetic RF telemetry based on IEEE 802.11 & 802.15.4 propagation models",
+    "total_samples": 100000,
+    "train_samples": 70000,
+    "val_samples": 15000,
+    "test_samples": 15000,
+    "features": [
+      "rssi_dbm",
+      "snr_db",
+      "packet_error_rate",
+      "retry_count",
+      "channel_busy_ratio",
+      "jitter_ms"
+    ]
+  },
+  "model_architecture": {
+    "type": "Feedforward Multilayer Perceptron (MLP)",
+    "layers": [
+      {
+        "name": "input",
+        "shape": [
+          6
+        ]
+      },
+      {
+        "name": "dense_1",
+        "units": 32,
+        "activation": "relu"
+      },
+      {
+        "name": "dense_2",
+        "units": 16,
+        "activation": "relu"
+      },
+      {
+        "name": "output",
+        "units": 3,
+        "activation": "softmax"
+      }
+    ],
+    "total_parameters": 803
+  },
+  "performance": {
+    "float32_test_accuracy": 0.9325,
+    "int8_test_accuracy": 0.9347,
+    "quantization_accuracy_drop_pct": -0.22,
+    "model_size_bytes": 4632,
+    "model_size_kb": 4.52,
+    "inference_latency_m33_ms": 1.18,
+    "confusion_matrix": [
+      [
+        792,
+        291,
+        2
+      ],
+      [
+        62,
+        6922,
+        416
+      ],
+      [
+        1,
+        241,
+        6273
+      ]
+    ],
+    "classification_report": {
+      "HEALTHY": {
+        "precision": 0.9263157894736842,
+        "recall": 0.7299539170506912,
+        "f1-score": 0.8164948453608247,
+        "support": 1085.0
+      },
+      "DEGRADING": {
+        "precision": 0.9286289240676147,
+        "recall": 0.9354054054054054,
+        "f1-score": 0.932004847179211,
+        "support": 7400.0
+      },
+      "CRITICAL": {
+        "precision": 0.9375280227170827,
+        "recall": 0.9628549501151189,
+        "f1-score": 0.9500227169468424,
+        "support": 6515.0
+      },
+      "accuracy": 0.9324666666666667,
+      "macro avg": {
+        "precision": 0.9308242454194605,
+        "recall": 0.8760714241904051,
+        "f1-score": 0.8995074698289595,
+        "support": 15000.0
+      },
+      "weighted avg": {
+        "precision": 0.9323267825120727,
+        "recall": 0.9324666666666667,
+        "f1-score": 0.9314753851500889,
+        "support": 15000.0
+      }
+    },
+    "noise_robustness": {
+      "sigma_0.05": {
+        "sigma": 0.05,
+        "accuracy": 0.9227,
+        "accuracy_pct": 92.27,
+        "drop_pct": 0.97
+      },
+      "sigma_0.1": {
+        "sigma": 0.1,
+        "accuracy": 0.9095,
+        "accuracy_pct": 90.95,
+        "drop_pct": 2.29
+      },
+      "sigma_0.2": {
+        "sigma": 0.2,
+        "accuracy": 0.8821,
+        "accuracy_pct": 88.21,
+        "drop_pct": 5.03
+      }
+    }
+  },
+  "timestamp": "2026-10-22 17:32:34 UTC"
+}
