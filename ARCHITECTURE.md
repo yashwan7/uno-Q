@@ -99,18 +99,10 @@ To prevent LLM hallucination or model divergence from destabilizing critical har
 
 ---
 
-## 5. Power Consumption Profile
+## 6. Power Consumption Profile & Methodology
 
-```
-Continuous Polling (Traditional):
-  Host active + WiFi TX: ~220 mA continuously
-  Daily Energy Consumption: ~18,700 mWh
+SlothMesh separates power into **Domain A (STM32U5 Cortex-M33 MCU)** and **Domain B (Qualcomm Linux Host)**:
 
-SlothMesh Energy Paced (Sloth Mode):
-  Standby (99.8% of time): 35 µA
-  M33 Wake (1.18 ms every 5s): 12 mA
-  Event Remediation (avg 2 events/day): 180 mA for 2 sec
-  Daily Energy Consumption: ~980 mWh
-  
-  --> 94.8% Reduction in Energy Consumption!
-```
+- **Duty-Cycled Linux Baseline (Periodic Wake without TinyML):** Linux wakes every 10s to sample radio (1.2s active @ 450 mA) $\rightarrow$ $\bar{I} \approx \mathbf{150.8\text{ mA}}$.
+- **SlothMesh Event-Driven Pacing:** Cortex-M33 wakes every 5s for 1.18 ms TinyML evaluation ($\approx \mathbf{38.5\,\mu\text{A}}$ MCU average). Linux host sleeps until actual degradation triggers hardware interrupt.
+- **Hardware Status:** See [`docs/POWER_MEASUREMENT.md`](docs/POWER_MEASUREMENT.md) for the step-by-step measurement procedure using a Nordic PPK2 / INA219. Empirical physical board current is marked `[TO BE MEASURED]`.
