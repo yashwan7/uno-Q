@@ -1,0 +1,45 @@
+name: SlothMesh CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Python Syntax & Compilation Verification
+      run: |
+        python -m py_compile agent/*.py models/*.py tests/*.py uno_q_core/*.py run_live_demo.py
+
+    - name: Run Pytest Test Suite
+      run: |
+        pytest tests/ -v
+
+    - name: Run Mocked Benchmark Verification
+      run: |
+        python agent/sloth_benchmark_eval.py --mock
+
+    - name: Verify Metrics and Scenario Files Exist
+      run: |
+        test -f models/metrics.json
+        test -f agent/scenarios.json
+        test -f data/slothmesh_telemetry_dataset.csv
+        echo "All critical artifacts verified."

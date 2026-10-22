@@ -7,3 +7,4 @@ __pycache__/
 node_modules/
 .pytest_cache/
 uno_q_core/live_status.json
+agent/decisions_audit.jsonl
