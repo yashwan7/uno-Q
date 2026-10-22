@@ -1,5 +1,5 @@
 ---
-title: "SlothMesh: The Ultra-Lazy, Energy-Paced Cognitive Edge Mesh for Arduino UNO Q"
+title: "SlothMesh: Energy-Paced Autonomous Edge AI for the Arduino UNO Q"
 published: true
 tags: devchallenge, hf26challenge, arduino, tinyml
 canonical_url: https://github.com/yashwan7/uno-Q
@@ -10,136 +10,142 @@ cover_image: https://raw.githubusercontent.com/yashwan7/uno-Q/main/dashboard/pre
 
 ---
 
-## What I Built
+## 🌟 What I Built
 
-Tomorrow is **International Sloth Day**, and sloths have life completely figured out: **they move at their own pace, conserve maximum energy, sleep 15+ hours a day, and let the world come to them.**
+SlothMesh channels the calm wisdom of the sloth: **move at your own pace, conserve maximum energy, and let the world come to you.**
 
-Meanwhile, in the tech world, anyone who manages IoT sensors, smart-home nodes, or wireless mesh networks suffers from the exact opposite of sloth-like peace. We spend hours:
-- Climbing ladders to point antennas at routers.
-- Staring at cryptic WiFi signal analyzers and jitter graphs.
-- Manually power-cycling unresponsive edge nodes.
-- Swapping drained batteries that were burnt out by power-hungry, continuous network polling.
+In IoT sensor networks, smart-home setups, and field edge systems, developers spend hours:
+- Staring at cryptic wireless signal analyzers and packet loss graphs.
+- Climbing ladders to point directional antennas.
+- Power-cycling unresponsive nodes.
+- Swapping batteries that were drained by power-hungry, continuous network polling.
 
-It’s exhausting, repetitive, and stressful.
+**SlothMesh is a zero-effort, physical edge AI sentinel engineered specifically for the dual-core Arduino UNO Q.** It couples an ultra-low-power microcontroller with an on-board Linux application processor to self-heal RF networks without requiring human intervention:
 
-**SlothMesh is a zero-effort, cognitive edge AI sentinel built for the Arduino UNO Q and ARM Cortex-M33 that does all the work so you don’t have to.**
-
-Instead of constantly draining power or demanding human intervention, SlothMesh channels the inner sloth:
-1. **Sleeps 99.8% of the time:** The ARM Cortex-M33 coprocessor stays in a deep standby "Sloth Nap" drawing just **35 µA**.
-2. **Paced, Slow & Steady Sensing:** Every 5 seconds, it takes a quick **1.18 ms** breath to run a **4.5 KB INT8 TinyML Neural Network** over 6 physical radio metrics (RSSI, SNR, Packet Error Rate, Retries, Channel Busy Ratio, and Jitter).
-3. **Autonomous Physical Self-Healing:** If a radio link degrades or an RF storm hits, it doesn’t beep at you or demand attention. It wakes up a local **open-weight Small Language Model (Qwen 0.6B / Gemma 2B)** on the Arduino UNO Q Linux host processor via 100% offline local inference. The model reasons over the telemetry, executes an **autonomous diversity antenna switch or seamless frequency channel hop**, and logs a peaceful two-sentence status report.
-
-**Who gets to be lazy? You do.** You stay on your couch, your devices stay connected, your batteries last months, and you never have to manually troubleshoot an edge wireless drop again.
+1. **The Sleepy Sentry (ARM Cortex-M33 Coprocessor):** Stays in low-power standby. Every 5 seconds ("slow and steady"), it wakes up for **1.18 milliseconds** to evaluate 6 physical radio features using a **4.5 KB INT8 TinyML Neural Network**. If the link is Healthy, it returns immediately to sleep—conserving power compared to continuous polling.
+2. **The Cognitive Remediator (Qualcomm Linux Host):** When persistent packet loss or RF jamming strikes, the M33 coprocessor fires a hardware interrupt line. The Linux host awakens a local **open-weight Small Language Model (Qwen 0.6B via Ollama)** to diagnose the physical root cause (multipath reflections vs. noise floor elevation vs. co-channel saturation) and autonomously actuate GPIO switches (diversity antenna swap or emergency channel hop).
+3. **The Deterministic Safety Gate (Laya System-1):** All model outputs are checked against hard mathematical boundaries (NOULs). If the language model hesitates or returns an invalid action during critical failure, the system falls back to a deterministic rule baseline (`agent/baseline_agent.py`) within microseconds.
 
 ---
 
-## Demo
+## 📹 Demo & Visualizations
 
-- **Interactive Live Dashboard:** Explore the cyber-sloth web dashboard with real-time RF gauges, live scenario injectors, dual-core pipeline animations, and open-weight model reasoning feeds: [https://github.com/yashwan7/uno-Q](https://github.com/yashwan7/uno-Q)
-- **Local Simulation:** Run `cd dashboard && python3 -m http.server 8080` to interact with live noise injection and watch the dual-core Arduino UNO Q self-heal.
-- **Hardware Telemetry Loop:** Run `python3 agent/sloth_agent.py` to watch the autonomous cognitive agent ingest Cortex-M33 packets and actuate GPIO switches in real-time.
+- **Interactive Tactical CAD Dashboard:** Live web interface featuring Leaflet radar map (centered on Sir MVIT Campus), real-time telemetry registers, scenario injectors, and dual-model reasoning feeds: `http://localhost:8085/`.
+- **Hardware-Free Simulation:** Run `python3 agent/sloth_agent.py --simulate` to observe real-time decision auditing without hardware.
+- **Physical Demo Runner:** Run `python3 run_live_demo.py` to stream live NXP/Arduino frames, inject multipath interference, and watch the system self-heal.
+- **Video Storyboard:** Full 60–90 second demo video script documented in [`docs/DEMO.md`](https://github.com/yashwan7/uno-Q/blob/main/docs/DEMO.md).
 
 ---
 
-## Code
+## 💻 Code Repository
 
-The complete open-source codebase—including Arduino UNO Q C++ firmware, INT8 TFLite Micro neural network headers, Python agent daemon, benchmark harness, and interactive dashboard—is available on GitHub:
+The complete open-source codebase—including Arduino UNO Q Zephyr C++ firmware, INT8 TFLite Micro neural network headers, Python agent daemon, baseline benchmark harness, and interactive dashboard—is available on GitHub under the **MIT License**:
 
 {% embed https://github.com/yashwan7/uno-Q %}
 
 ---
 
-## How I Built It
+## 🏗️ How I Built It: Dual-Core Hardware Co-Design
 
-SlothMesh is engineered around a **dual-core hardware co-design** tailored specifically for the architecture of the **Arduino UNO Q**:
+SlothMesh is engineered around the asymmetric hardware architecture of the **Arduino UNO Q**:
 
 ```
-                       [ Physical Edge Radio Environment ]
+                       [ Physical Wireless Radio Signals ]
                                         │
-                         (6 RF Telemetry Features)
-                                        │
-                                        ▼
-   ┌────────────────────────────────────────────────────────────────────────┐
-   │ 🦥 TIER 1: ARM Cortex-M33 Coprocessor (Real-Time Sensing)              │
-   │  • Deep Standby "Sloth Nap" Mode (35 µA draw)                          │
-   │  • Wakes every 5 seconds ("Slow and Steady")                           │
-   │  • Runs 4.5 KB INT8 Quantized TFLite Micro Neural Network in 1.18 ms   │
-   │  • Result: HEALTHY ───► Continues Sloth Nap (No Host Wakeup)           │
-   │            DEGRADING/CRITICAL ───► Pulses Hardware Interrupt (GPIO 3)  │
-   └────────────────────────────────────┬───────────────────────────────────┘
-                                        │ (Serial IPC Binary Packet)
-                                        ▼
-   ┌────────────────────────────────────────────────────────────────────────┐
-   │ 🧠 TIER 2: Arduino UNO Q Linux Host SoC (Cognitive Open-Weight SLM)    │
-   │  • Runs local open-weight Qwen 3 (0.6B) / Gemma 2B via Ollama / NPU    │
-   │  • 100% Offline | Zero Cloud Dependencies | Zero Latency Bills         │
-   │  • Causal Diagnosis: Disentangles multipath fading from RF jamming     │
-   │  • Physical Actuation: Toggles Antenna GPIO 4 or Mesh Channel (6->11)  │
-   └────────────────────────────────────────────────────────────────────────┘
+                         (6 RF Telemetry Registers)
                                         │
                                         ▼
-                  [ Mesh Self-Heals | User Stays on Couch ]
+    ┌────────────────────────────────────────────────────────────────────────┐
+    │ 🦥 TIER 1: ARM Cortex-M33 Real-Time Coprocessor                        │
+    │  • Low-Power Standby Mode (35 µA datasheet typical)                    │
+    │  • Wakes every 5 seconds ("Slow and Steady")                           │
+    │  • Runs 4.52 KB INT8 Quantized Neural Network in 1.18 ms               │
+    │  • Result: HEALTHY ───► Continues Standby (Linux Host stays asleep)    │
+    │            DEGRADING/CRITICAL ───► Pulses Hardware Interrupt (GPIO)    │
+    └───────────────────────────────────┬────────────────────────────────────┘
+                                        │ (14-Byte Binary IPC Packet)
+                                        ▼
+    ┌────────────────────────────────────────────────────────────────────────┐
+    │ 🧠 TIER 2: Arduino UNO Q Linux Host SoC (Open-Weight Model)            │
+    │  • Runs local open-weight Qwen 3 (0.6B) via Ollama (100% Offline)      │
+    │  • Disentangles multipath fading from co-channel jamming               │
+    │  • Governed by Laya System-1 Safety Gate & Rule Baseline Fallback      │
+    │  • Actuation: Toggles Antenna GPIO 4 or Mesh Channel Hop (Ch 6 -> 11)  │
+    └────────────────────────────────────────────────────────────────────────┘
+                                        │
+                                        ▼
+                   [ Mesh Self-Heals | User Stays on Couch ]
 ```
 
-### 1. The Low-Power TinyML Classifier (ARM Cortex-M33)
+### 1. The TinyML Classifier (ARM Cortex-M33)
 - **Model Architecture:** Fully quantized Multi-Layer Perceptron (6 inputs $\rightarrow$ 32 ReLU $\rightarrow$ 16 ReLU $\rightarrow$ 3 Softmax).
-- **Dataset:** Trained on 100,000 real-world edge RF propagation samples (`data/slothmesh_telemetry_dataset.csv`).
-- **Memory Footprint:** Just **4,568 bytes (< 4.5 KB)**, leaving **98% of the Cortex-M33 microcontroller's RAM free** for user peripherals.
-- **Inference Latency:** **1.18 ms** per inference.
+- **Quantization:** Fully integer quantized (`TFLITE_BUILTINS_INT8`).
+- **Memory Footprint:** **4,632 bytes (4.52 KB)**, leaving **98% of the Cortex-M33 microcontroller's RAM free** for user peripherals.
+- **Inference Latency:** **1.18 ms** per inference @ 160 MHz.
+- **Accuracy on Unseen Test Split:** **93.47% INT8 test accuracy** (with negligible 0.22% quantization drop from float32 baseline).
+- **Noise Robustness:** Evaluated with Gaussian noise injections ($\sigma=0.10$ maintains 90.95% accuracy).
 
-### 2. The Local Open-Weight SLM Agent (Arduino UNO Q Linux Host)
-- **Local Open-Weight Brain:** Runs **Qwen 3 (0.6B)** (522 MB) locally on the Arduino UNO Q host.
-- **Strict Schema Guard:** Employs a structured JSON schema enforcing `reason` and `recommendation` fields while validating against hallucinations.
-- **Physical Actuation:** Toggles Arduino GPIO pins to physically engage diversity antennas, trigger channel hops, or adjust clear-channel assessment (CCA) backoff windows.
-
----
-
-## Why Does Open Innovation Matter?
-
-What did an open-source approach make possible that a closed API wouldn’t?
-
-1. **Runs in the Middle of Nowhere with Zero Internet:**
-   Disasters, outdoor farms, wilderness research stations, and remote field camps don't have high-speed cellular or internet connections. A proprietary closed-source API (like OpenAI or Anthropic) is completely useless the second the internet drops. SlothMesh runs **100% locally on the Arduino UNO Q**, reasoning and self-healing in complete isolation.
-2. **Absolute Data Privacy & Sovereignty:**
-   Industrial radio telemetry and mesh routing coordinates contain sensitive physical operational data. Because open-weight models run entirely in onboard memory, zero bytes ever leave your device or get ingested into a third-party training silo.
-3. **Precision Quantization for Microcontrollers:**
-   You cannot quantize a closed-source cloud API into a 4.5 KB C-array header for an ARM Cortex-M33 microcontroller. Open weights and open frameworks (TensorFlow Lite Micro, ONNX, Ollama) allow us to sculpt neural networks down to the exact byte count required for ultra-low-power silicon.
-4. **Zero Recurring Subscription Costs ($0 Forever):**
-   Continuous edge polling via cloud APIs costs dozens or hundreds of dollars every month. SlothMesh runs open-weight models for free, forever. You buy the hardware once, flash it, and it does the work while you relax.
+### 2. The Local Open-Weight SLM Agent (Linux Host)
+- **Local Brain:** Runs **Qwen 3 (0.6B)** (522 MB) locally via Ollama with zero internet connection.
+- **Safety Allowlist:** Enforces actions strictly from `ALLOWED_ACTIONS` (`CONTINUE_NORMAL_OPERATION`, `MONITOR_AND_EVALUATE_FAILOVER`, `TRIGGER_FAILOVER`).
+- **Deterministic Fallback:** 5.0-second execution timeout; if the model fails or hallucinates, `BaselineRuleAgent` takes over immediately.
+- **Audit Logging:** Logs every decision, latency timestamp, and reasoning trace to `agent/decisions_audit.jsonl`.
 
 ---
 
-## The Lazy Payoff
+## 📊 Benchmark Comparison: Baseline vs. Open-Weight SLMs
 
-Here is the empirical breakdown of time, energy, and effort saved:
+We evaluated our rule-based remediation baseline (`agent/baseline_agent.py`) against **Qwen 3 (0.6B)** across **40 diverse scenarios** (`agent/scenarios.json`), covering multipath fade, fringe boundary, airtime exhaustion, queue bufferbloat, and co-channel jamming:
 
-| Dimension | The Exhausting Old Way | The SlothMesh Way | Lazy Savings |
-| :--- | :--- | :--- | :--- |
-| **Human Troubleshooting** | 15 to 45 minutes diagnosing drops | **0.00 minutes** (100% autonomous) | **No couch departures** |
-| **Standby Power Consumption**| Continuous polling (~220 mA) | **35 µA** (Sloth sleep pacing) | **94.8% energy conserved** |
-| **Edge Decision Latency** | 450–1500 ms roundtrip to cloud | **1.18 ms** on Cortex-M33 | **Instant local response** |
-| **Monthly Subscription** | $15–$50 / month in API calls | **$0.00** | **Free forever** |
+| Architecture / Model | Remediation Correctness | Factual Consistency | Mean Latency | RAM Footprint | Execution Target |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Rule-Based Baseline** | **40 / 40 (100.0%)** | 9 / 40 (22.5%)* | **< 0.05 ms** | **1.2 KB** | Cortex-M33 / Linux Host |
+| **Qwen 3 (0.6B)** (Unconstrained) | 22 / 40 (55.0%) | 31 / 40 (77.5%) | **2.62 s** | **522 MB** | Arduino UNO Q Host |
+| **SlothMesh Cascaded System** | **40 / 40 (100.0%)** | **38 / 40 (95.0%)** | **2.62 s** (SLM) / **1.18 ms** (M33) | **522 MB** | Dual-Core Asymmetric Pipeline |
 
-### Benchmark Results on Open-Weight Models:
-We subjected local open-weight models to a factual verification test across 8 edge scenarios:
-- **TinyML INT8 MLP (Cortex-M33):** **8 / 8 clean passes**, **1.18 ms latency**, **0 hallucinations**.
-- **Qwen 3 (0.6B) (Arduino Host SoC):** **7 / 8 clean passes**, **1.82 s latency**, **522 MB RAM**.
-- **Qwen 3 (4B) (Arduino Host SoC):** **8 / 8 clean passes**, **45.05 s latency**, **2.5 GB RAM**.
+*\*Note: The rule-based baseline outputs formatted diagnostic strings that include threshold bounds not present in raw input registers, triggering the numeric filter.*
 
-> **The Edge AI Sweet Spot:** Sub-1B open-weight models like **Qwen 0.6B** provide the perfect harmony of factual diagnosis and sub-2-second edge execution, allowing the Arduino UNO Q to wake up, fix the issue, and return to energy-saving sleep immediately!
+### Honest Tradeoff Analysis:
+- **Where the Baseline Wins:** Microsecond execution (<0.05 ms), 1.2 KB memory, and 100% deterministic safety bounds.
+- **Where the SLM Wins:** Nuanced causal attribution (explaining *why* multipath reflections differ from thermal noise or bufferbloat), generating plain-language incident reports for network operators, and synthesizing compound multi-variable interactions.
+- **The SlothMesh Solution:** Pair them together. The SLM provides the intelligence and explanation; the rule baseline provides the safety invariant.
 
 ---
 
-## Prize Categories
+## ⚡ Energy & Power Profile
 
-### 🏆 Featured Category: Best Use of Arduino ($200 USD)
-SlothMesh is custom-architected specifically for the **Arduino UNO Q**:
-- It exploits the board's unique **asymmetric dual-architecture**: running an ultra-compact **4.5 KB INT8 TinyML neural network on the ARM Cortex-M33 real-time coprocessor** while leveraging the **Qualcomm Snapdragon Linux host SoC** to run local open-weight SLMs.
-- It acts as a true **physical agent that senses and acts**: ingesting physical RF transceiver registers and actuating physical GPIO lines (antenna diversity switch, hardware wake interrupts, and radio frequency switching).
-- It is fully optimizable with **Qualcomm AI Hub** for on-board NPU hardware acceleration.
+- **Duty-Cycled Linux Polling (1.2s active @ 450 mA every 10s):** Average current $\approx \mathbf{150.8\text{ mA}}$.
+- **SlothMesh Event-Driven Architecture:** The Cortex-M33 runs the 1.18 ms TinyML check every 5s ($\approx 38.5\,\mu\text{A}$ MCU average). The Linux host remains in deep suspend, waking only during actual RF anomalies (e.g., ~4 incidents/day).
+- **Measurement Status:** Physical current traces on the Arduino UNO Q rails are documented in [`docs/POWER_MEASUREMENT.md`](https://github.com/yashwan7/uno-Q/blob/main/docs/POWER_MEASUREMENT.md) with step-by-step instructions for Nordic PPK2 / INA219 instruments. Values pending empirical measurement are marked `[TO BE MEASURED]`.
 
 ---
 
-## Acknowledgments & Open Source Stack
-- Built with **Arduino UNO Q**, **TensorFlow Lite Micro**, **Ollama**, and **Qwen 3**.
-- Dedicated to **International Sloth Day 🦥** — may we all conserve our energy and let our code do the hard work!
+## 🧠 Why Does Open Innovation Matter?
+
+1. **Runs Completely Offline with Zero Cloud Reliance:** Disasters, remote agricultural fields, and marine stations do not have dependable internet connections. SlothMesh runs 100% on the Arduino UNO Q silicon.
+2. **Absolute Data Privacy:** Edge RF telemetry, device positions, and network topology never leave the local hardware.
+3. **Custom Hardware Quantization:** Open weights allow precision quantization down to a 4.52 KB INT8 C-array header that executes within microcontroller SRAM.
+4. **Zero Recurring API Costs:** You buy the hardware once, flash it, and it runs for free forever.
+
+---
+
+## ⚠️ Limitations & Future Work
+
+- **Synthetic Training Telemetry:** The initial 100,000-sample dataset was synthetically generated from mathematical IEEE propagation formulas. We have provided `data/log_real_telemetry.py` to capture live transceiver frames for retraining.
+- **Power Profiler Verification:** While the 1.18 ms execution time is verified via DWT cycle counters, whole-board current traces are scheduled for measurement with a Nordic PPK2 as outlined in `docs/POWER_MEASUREMENT.md`.
+- **What's Next:** Direct on-device GGUF inference via `llama-cpp-python` (removing the Ollama daemon) and NPU hardware acceleration via Qualcomm AI Hub.
+
+---
+
+## 🏆 Prize Categories
+
+- **Featured Category:** **Best Use of Arduino ($200 USD)**  
+  *Engineered specifically for the **Arduino UNO Q**, taking full advantage of its dual-core architecture: 4.52 KB INT8 TinyML running on the real-time ARM Cortex-M33 coprocessor, coupled with an open-weight Small Language Model running on the Qualcomm Linux host SoC.*
+- **Main Challenge:** **Hacktoberfest Open-Source AI Challenge Week 3: Slow and Steady ($250 USD)**  
+  *An energy-paced, sloth-inspired edge AI system that eliminates human troubleshooting and conserves power through asymmetric edge computing.*
+
+---
+
+## 📜 License & Acknowledgments
+Licensed under the **MIT License**. Built with Arduino UNO Q, TensorFlow Lite Micro, Ollama, and Qwen 3.
+Dedicated to International Sloth Day 🦥—may our code work smart so we can rest easy!

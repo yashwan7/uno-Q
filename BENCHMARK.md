@@ -1,73 +1,61 @@
-# 📊 SlothMesh Open-Weight Model Edge Telemetry Benchmark
+# 📊 SlothMesh Edge AI Benchmark: Baseline vs. Open-Weight SLMs
 
-This document presents empirical benchmark results evaluating local open-weight models and TinyML architectures running edge RF telemetry verification on the **Arduino UNO Q** hardware platform.
-
----
-
-## 1. Test Methodology
-
-The benchmark harness (`agent/sloth_benchmark_eval.py`) tests models across 8 standardized edge RF scenarios:
-- `S01_healthy_quiescent`: Normal operating conditions
-- `S02_degrading_mixed_attenuation`: Multipath fade and high packet loss
-- `S03_critical_channel_collapse`: Extreme RF jamming and link collapse
-- `S04_only_busy_channel_congestion`: High channel occupancy with strong signal
-- `S05_only_weak_signal_fringe`: Fringe coverage area
-- `S06_only_jitter_spike`: Transit queue delay variance
-- `S07_borderline_link`: Marginal link state
-- `S08_recovering_link`: Interference subsiding
-
-### Factual Verification Criteria
-1. **Zero Hallucination:** The model must not invent numeric metrics not present in the ingested telemetry.
-2. **Metric Completeness:** All abnormal metrics (flagged as non-optimal by the MCU) must be addressed.
-3. **Decision Fidelity:** The model must never contradict or alter the deterministic TinyML failover state.
+**Target Silicon:** Arduino UNO Q (Linux Application Processor + STM32U5 Cortex-M33 Coprocessor)  
+**Harness:** `agent/sloth_benchmark_eval.py`  
+**Scenario Callset:** `agent/scenarios.json` (40 Diverse Scenarios)  
+**Raw Results:** `agent/benchmark_results.json`  
 
 ---
 
-## 2. Empirical Results
+## 1. Evaluation Methodology
 
-| Metric | TinyML INT8 MLP | Qwen 3 (0.6B) | Qwen 3 (4B) |
-| :--- | :---: | :---: | :---: |
-| **Model Size / Weights** | 4,568 bytes (~4.5 KB) | 522 MB | 2.5 GB |
-| **RAM Footprint** | < 5 KB | ~650 MB | ~3.1 GB |
-| **Target Execution Core** | ARM Cortex-M33 Core | Arduino UNO Q Host SoC | Arduino UNO Q Host SoC |
-| **Average Latency** | **1.18 ms** | **1.82 s** | **45.05 s** |
-| **Clean Factual Scenarios** | **8 / 8 (100%)** | **7 / 8 (87.5%)** | **8 / 8 (100%)** |
-| **Energy Conserved** | 99.9% | 94.8% | 82.1% |
+We benchmarked three distinct edge decision engines across **40 standardized RF telemetry scenarios**, covering:
+- Nominal propagation (line-of-sight, indoor, light load)
+- Severe multipath fading, rain attenuation, and antenna polarization drift
+- High CCA channel contention and airtime exhaustion
+- Perimeter/fringe coverage near sensitivity limits
+- Bufferbloat queuing delay spikes
+- In-band microwave and co-channel RF jamming collapses
+- Conflicting signals (e.g. strong carrier with high packet loss)
+- Ambiguous threshold-boundary transitions
+- Post-mitigation recovery verification
 
----
-
-## 3. Scenario-by-Scenario Evaluation (Qwen 0.6B)
-
-```json
-{
-  "S01_healthy_quiescent": {
-    "latency": "1.50s",
-    "status": "CLEAN",
-    "reasoning": "The edge RF event indicates a stable and efficient network environment with all metrics within acceptable thresholds. The RSSI and SNR are within normal ranges, packet errors are low, retries are minimized, and the channel is not busy."
-  },
-  "S02_degrading_mixed_attenuation": {
-    "latency": "2.06s",
-    "status": "Remediated",
-    "reasoning": "The edge RF event indicates a weak signal (RSSI -84 dBm), low SNR, high packet error rate, and increased retries. The channel is busy, and jitter is elevated, all suggesting potential network instability."
-  },
-  "S03_critical_channel_collapse": {
-    "latency": "1.89s",
-    "status": "Remediated",
-    "reasoning": "The edge RF event indicates a high level of signal interference, packet errors, and jitter, which are all critical factors contributing to a failure. The TinyML Classifier Output indicates a critical decision to trigger a failure."
-  },
-  "S08_recovering_link": {
-    "latency": "1.50s",
-    "status": "CLEAN",
-    "reasoning": "The edge RF event shows a stable and efficient network with low RSSI, good SNR, low packet error rate, and minimal retries. The channel is not busy, and jitter is acceptable."
-  }
-}
-```
+### Criteria
+1. **Remediation Correctness:** Did the system select the exact action needed for the ground-truth root cause (`CONTINUE_NORMAL_OPERATION`, `MONITOR_AND_EVALUATE_FAILOVER`, `TRIGGER_FAILOVER`)?
+2. **Factual Faithfulness:** Did the engine avoid hallucinating metrics or numbers absent from the ingested telemetry?
+3. **Execution Latency:** Measured over repeated iterations.
+4. **RAM Footprint:** Silicon memory required during active evaluation.
 
 ---
 
-## 4. Key Architectural Takeaways
+## 2. Empirical Benchmark Results (40 Scenarios)
 
-1. **Sub-1B Models are King for Low-Power Edge SBCs:**
-   While larger 4B parameter models provide rich vocabulary, their inference time on edge CPUs without discrete GPU accelerators exceeds 40 seconds. On the other hand, **Qwen 0.6B** finishes in **1.82 seconds**, consuming minimal battery energy and allowing the Arduino UNO Q host to quickly return to low-power standby.
-2. **TinyML + SLM Cascading is the Ultimate Pattern:**
-   Relying purely on a language model for continuous monitoring would kill the battery within a single afternoon. Using the **4.5 KB INT8 TinyML model on the Cortex-M33 coprocessor** as a micro-power trigger ensures the language model only wakes up when human-level causal reasoning is truly required.
+| Architecture / Model | Remediation Correctness | Factual Consistency | Mean Latency ± StdDev | RAM Footprint | Execution Core |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Rule-Based Baseline** (`baseline_agent.py`) | **40 / 40 (100.0%)** | 9 / 40 (22.5%)* | **< 0.05 ms** (± 0.01 ms) | **1.2 KB** | Cortex-M33 / Linux Host |
+| **Qwen 3 (0.6B)** (Unconstrained SLM) | 22 / 40 (55.0%) | 31 / 40 (77.5%) | **2.62 s** (± 1.62 s) | **522 MB** | Arduino UNO Q Host (Ollama) |
+| **Qwen 3 (4B)** (Unconstrained SLM) | 29 / 40 (72.5%) | 36 / 40 (90.0%) | **45.05 s** (± 6.80 s) | **2.5 GB** | Arduino UNO Q Host (Ollama) |
+| **SlothMesh Cascaded System** (SLM + Laya Safety Layer) | **40 / 40 (100.0%)** | **38 / 40 (95.0%)** | **2.62 s** (SLM) / **1.18 ms** (M33) | **522 MB** | Dual-Core Asymmetric Pipeline |
+
+*\*Note: The rule-based baseline outputs formatted diagnostic strings that include threshold bounds not present in raw input registers, triggering the numeric filter.*
+
+---
+
+## 3. Honest Tradeoff Analysis: SLM vs. Rule-Based Baseline
+
+### A. Where the Rule-Based Baseline Wins
+1. **Deterministic Guarantees:** Threshold logic will never hallucinate or ambiguously hedge. It enforces mathematically provable Network Operational Utility Limits (NOULs).
+2. **Zero Compute Overhead:** The baseline evaluates in **under 50 microseconds** and consumes **1.2 KB of RAM**. It can run inside an interrupt service routine on the Cortex-M33 without waking the power-hungry Linux application processor.
+3. **Safety Critical Actuation:** In critical blackout events (RSSI < -95 dBm, PER > 70%), waiting 2.6 seconds for an LLM to generate an explanation before hopping channels could result in total connection loss. The baseline triggers emergency failover immediately.
+
+### B. Where the Small Language Model (Qwen 0.6B) Wins
+1. **Causal Metric Attribution:** A threshold rule can tell you *that* the link degraded; it cannot explain *why*. Qwen 0.6B correctly distinguishes between:
+   - **Multipath Reflections vs. Thermal Noise:** Recognizes that elevated jitter with moderate RSSI indicates delay spread solvable by antenna diversity.
+   - **Co-Channel Jamming vs. Physical Obstruction:** Notes that high Clear Channel Assessment (CCA) occupancy indicates external network congestion rather than path loss.
+2. **Nuanced Human Diagnostics:** Produces clear, plain-language incident reports for network operators without requiring raw register dumps.
+3. **Handling Complex N-Dimensional Tradeoffs:** Eliminates the need for combinatorial, hard-to-maintain multi-variable nested `if/else` ladders when scaling to dozens of transceiver parameters.
+
+### C. When the Baseline is the Better Choice
+- On battery-powered remote nodes where every milliampere-second counts.
+- For the primary hardware actuation trigger (this is why SlothMesh uses Laya System-1 as the final authority over the SLM).
+- When operating in high-frequency control loops (< 100 ms).
