@@ -60,6 +60,23 @@ def capture_proc_net_wireless(interface: str) -> Optional[Dict[str, float]]:
         pass
     return None
 
+def capture_wpa_cli(interface: str) -> Optional[Dict[str, float]]:
+    """Queries `wpa_cli -i <wlan> signal_poll` directly from Qualcomm wireless driver."""
+    try:
+        out = subprocess.check_output(["wpa_cli", "-i", interface, "signal_poll"], stderr=subprocess.DEVNULL, timeout=1.0).decode("utf-8")
+        rssi, noise = None, None
+        for line in out.splitlines():
+            if line.startswith("RSSI="):
+                rssi = float(line.split("=")[1])
+            elif line.startswith("NOISE="):
+                noise = float(line.split("=")[1])
+        if rssi is not None:
+            noise_val = noise if noise is not None else -95.0
+            return {"rssi": rssi, "noise": noise_val, "snr": rssi - noise_val}
+    except Exception:
+        pass
+    return None
+
 def capture_iw_link(interface: str) -> Dict[str, float]:
     """Queries `iw dev <wlan> link` for RSSI and TX bitrate."""
     result = {"rssi": -65.0, "noise": -95.0, "snr": 30.0}
@@ -166,15 +183,17 @@ def main():
     print("=" * 70)
 
     # Detect if wireless tools are available
-    has_iw = False
-    try:
-        subprocess.check_output(["which", "iw"], stderr=subprocess.DEVNULL)
-        has_iw = True
-    except Exception:
-        pass
+    has_wireless_tool = False
+    for tool in ["wpa_cli", "iw"]:
+        try:
+            subprocess.check_output(["which", tool], stderr=subprocess.DEVNULL)
+            has_wireless_tool = True
+            break
+        except Exception:
+            pass
 
-    if not has_iw and not args.simulate:
-        print("[WARNING] `iw` command not found on host. Defaulting to simulated telemetry capture.")
+    if not has_wireless_tool and not args.simulate:
+        print("[WARNING] `wpa_cli` / `iw` commands not found on host. Defaulting to simulated telemetry capture.")
         args.simulate = True
 
     fieldnames = ['rssi_dbm', 'snr_db', 'packet_error_rate', 'retry_count', 'channel_busy_ratio', 'jitter_ms', 'label']
@@ -190,14 +209,22 @@ def main():
             if args.simulate:
                 record = generate_simulated_frame(args.label)
             else:
+                wpa_info = capture_wpa_cli(args.interface)
                 proc_info = capture_proc_net_wireless(args.interface)
                 iw_link = capture_iw_link(args.interface)
                 iw_sta = capture_iw_station(args.interface)
                 busy = capture_iw_survey(args.interface)
                 jitter = measure_jitter(args.gateway)
 
-                rssi = proc_info["rssi"] if proc_info else iw_link["rssi"]
-                snr = proc_info["snr"] if proc_info else iw_link["snr"]
+                if wpa_info:
+                    rssi = wpa_info["rssi"]
+                    snr = wpa_info["snr"]
+                elif proc_info:
+                    rssi = proc_info["rssi"]
+                    snr = proc_info["snr"]
+                else:
+                    rssi = iw_link["rssi"]
+                    snr = iw_link["snr"]
 
                 record = {
                     "rssi_dbm": round(rssi, 3),

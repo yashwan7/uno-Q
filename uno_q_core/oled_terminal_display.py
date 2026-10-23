@@ -5,6 +5,7 @@ Supports:
 2. High-Fidelity Dual-Model ANSI OLED Emulation for Terminal / Console Demo
 """
 
+import os
 import sys
 import time
 from typing import Dict, Any, Optional
@@ -92,6 +93,7 @@ class OLEDDisplay:
         qwen_status = "VALID" if qwen_info.get("validated", True) else "OVERRULED"
         qwen_color = "\033[92m" if qwen_info.get("validated", True) else "\033[91m"
 
+        smollm_line = f"SmolLM 135M [{smollm_info.get('latency_sec', 0.1):.2f}s]: {smollm_info.get('action', 'CONTINUE')[:24]} ({smollm_color}{smollm_status}{reset})"
         deep_model_name = os.getenv("DEEP_SLM_MODEL", "qwen3:0.6b").replace("qwen3:", "Qwen3 ").replace(":", " ")
         qwen_line = f"{deep_model_name:<11s} [{qwen_info.get('latency_sec', 1.8):.2f}s]: {causal_exp[:36]}"
 

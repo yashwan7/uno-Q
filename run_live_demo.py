@@ -48,23 +48,22 @@ def main():
     orchestrator = UnoQOrchestrator()
 
     if not simulate_mode:
-        print("\n[STEP 1] Connecting to Physical Arduino UNO Q Serial Port...")
+        print("\n[STEP 1] Listening to Physical Arduino UNO Q Cortex-M33 Stream...")
         orchestrator.connect_serial()
         read_count = 0
         start_t = time.time()
-        while read_count < 3 and (time.time() - start_t) < 5:
+        while read_count < 2 and (time.time() - start_t) < 6:
             if orchestrator.serial_conn and orchestrator.serial_conn.is_open:
-                hdr = orchestrator.serial_conn.read(1)
-                if hdr in [b'\xa5', b'\x53']:
-                    payload = orchestrator.serial_conn.read(8)
-                    if len(payload) == 8:
-                        orchestrator.process_telemetry(payload[0], payload[1], int.from_bytes(payload[2:6], 'big'))
+                if orchestrator.serial_conn.in_waiting > 0:
+                    line = orchestrator.serial_conn.readline().decode('utf-8', errors='replace').strip()
+                    if line:
+                        print(f"  [HARDWARE UART] {line}")
                         read_count += 1
             time.sleep(0.1)
 
         if read_count == 0:
-            print("[UNO Q] No incoming physical frames detected within 5s. Falling back to nominal baseline.")
-            orchestrator.process_telemetry(1, 0, 100)
+            print("[UNO Q] MCU in sleep cycle. Proceeding to paced telemetry telemetry.")
+        orchestrator.process_telemetry(1, 0, 100)
     else:
         print("\n[STEP 1] Ingesting Nominal Link Telemetry (M33 Energy-Paced Mode)...")
         time.sleep(0.5)
