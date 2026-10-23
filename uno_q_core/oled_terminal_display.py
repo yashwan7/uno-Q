@@ -38,7 +38,7 @@ class OLEDDisplay:
 
         box = f"""
 {gray}┌────────────────────────────────────────────────────────┐{reset}
-{gray}│{reset}  {bold}📟 ARDUINO UNO Q / NXP OLED DASHBOARD{reset}  {gray}[128x64 I2C]{reset}        {gray}│{reset}
+{gray}│{reset}  {bold}📟 ARDUINO UNO Q OLED DASHBOARD{reset}  {gray}[128x64 I2C]{reset}            {gray}│{reset}
 {gray}├────────────────────────────────────────────────────────┤{reset}
 {gray}│{reset}  Node: {bold}NODE-{node_id:02d}{reset}   │  Link State: {color}{bold}{status:12s}{reset}       {gray}│{reset}
 {gray}│{reset}  RSSI: {cyan}{rssi:5.1f} dBm{reset}  │  SNR: {cyan}{snr:4.1f} dB{reset}                     {gray}│{reset}

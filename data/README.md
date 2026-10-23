@@ -67,8 +67,8 @@ The synthetic dataset was synthesized using the following Gaussian mixture distr
 To transition from synthetic to measured real-world telemetry, use the included logging script:
 
 ```bash
-# Log live telemetry from connected Arduino UNO Q / NXP board over serial
-python3 data/log_real_telemetry.py --port /dev/cu.usbmodem* --baud 115200 --output data/real_telemetry.csv
+# Log live telemetry from connected Arduino UNO Q over Linux Wi-Fi or serial bridge
+python3 data/capture_real_rf.py --interface wlan0 --output data/real_telemetry.csv
 ```
 
 Once at least 500 real frames are captured across different environmental conditions, retrain the model:

@@ -1,6 +1,6 @@
 /**
  * 🦥 SlothMesh: Autonomous Edge RF Sentinel & Energy-Paced Microcontroller Firmware
- * Target: Arduino UNO Q (ARM Cortex-M33 Core) / NXP FRDM MCXN236
+ * Target: Arduino UNO Q (STM32U585 Cortex-M33 MCU)
  *
  * Core Concept:
  * Sloths survive by moving slowly and conserving maximum energy.

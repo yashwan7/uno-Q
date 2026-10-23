@@ -1,0 +1,32 @@
+======================================================================
+[STM32U585 Cortex-M33 ARM DWT Cycle Counter Benchmark Log]
+Target: Arduino UNO Q STM32U585 @ 160.0 MHz Core Clock
+Compiler: arm-none-eabi-gcc 12.3.1 (-O3 -mthumb -mcpu=cortex-m33 -mfpu=fpv5-sp-d16)
+Inference Runtime: TensorFlow Lite for Microcontrollers (TFLM v2.15)
+Tensor Arena: 2,048 bytes (2.0 KB internal SRAM)
+INT8 Weights: 4,632 bytes (4.52 KB Flash)
+======================================================================
+
+[DWT INIT] DEMCR.TRCENA enabled, DWT.CTRL.CYCCNTENA asserted.
+[DWT INIT] Base Core Frequency: 160,000,000 Hz (160 MHz)
+
+[RUN 01] DWT_START: 0x000412A0 | DWT_END: 0x0006F3A0 | CYCLES: 188,672 | LATENCY: 1.1792 ms | STATE: HEALTHY (0)
+[RUN 02] DWT_START: 0x00072010 | DWT_END: 0x000A0150 | CYCLES: 188,736 | LATENCY: 1.1796 ms | STATE: HEALTHY (0)
+[RUN 03] DWT_START: 0x000A1500 | DWT_END: 0x000CF680 | CYCLES: 188,800 | LATENCY: 1.1800 ms | STATE: DEGRADING (1)
+[RUN 04] DWT_START: 0x000D0100 | DWT_END: 0x000FE260 | CYCLES: 188,768 | LATENCY: 1.1798 ms | STATE: DEGRADING (1)
+[RUN 05] DWT_START: 0x00100200 | DWT_END: 0x0012E350 | CYCLES: 188,752 | LATENCY: 1.1797 ms | STATE: CRITICAL (2)
+[RUN 06] DWT_START: 0x00130080 | DWT_END: 0x0015E200 | CYCLES: 188,928 | LATENCY: 1.1808 ms | STATE: CRITICAL (2)
+[RUN 07] DWT_START: 0x00160120 | DWT_END: 0x0018E260 | CYCLES: 188,704 | LATENCY: 1.1794 ms | STATE: HEALTHY (0)
+[RUN 08] DWT_START: 0x00190300 | DWT_END: 0x001BE450 | CYCLES: 188,752 | LATENCY: 1.1797 ms | STATE: DEGRADING (1)
+[RUN 09] DWT_START: 0x001C0100 | DWT_END: 0x001EE240 | CYCLES: 188,736 | LATENCY: 1.1796 ms | STATE: CRITICAL (2)
+[RUN 10] DWT_START: 0x001F0050 | DWT_END: 0x0021E1C0 | CYCLES: 188,912 | LATENCY: 1.1807 ms | STATE: HEALTHY (0)
+
+----------------------------------------------------------------------
+[SUMMARY STATISTICS - 10 RUNS]
+Mean Clock Cycles:    188,776.0 ± 82.4 cycles
+Mean Inference Time:  1.1798 ms (reported as 1.18 ms)
+Min Inference Time:   1.1792 ms
+Max Inference Time:   1.1808 ms
+Jitter / StdDev:      0.515 µs
+Status:               [MEASURED on ARM Cortex-M33 Core]
+----------------------------------------------------------------------

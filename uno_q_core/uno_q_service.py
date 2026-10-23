@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
 Arduino UNO Q Orchestration Service: Edge Telemetry Sentinel & Dual-Model Cognitive Layer
-Hardware Target: Arduino UNO Q (Linux Application Processor + STM32U5 Cortex-M33)
-Connected Hardware: NXP FRDM-MCXN236 (/dev/cu.usbmodemFIK54L1PUAFFP3)
+Hardware Target: Arduino UNO Q (Qualcomm Linux AP + STM32U585 Cortex-M33 MCU Bridge)
 
 Features:
-- Live NXP binary frame parsing (0xA5 protocol)
+- Live MCU Bridge binary frame parsing (0xA5 IPC protocol)
 - Node heartbeat & timeout tracking (3.5s expiration)
 - Tier 1: SmolLM2 135M (Fast Triage Agent)
 - Tier 2: Qwen 3 0.6B (Deep Causal Attribution & Chain-of-Thought)
@@ -33,7 +32,7 @@ HEARTBEAT_TIMEOUT_SEC = 3.5
 
 class UnoQOrchestrator:
     def __init__(self, serial_port=None, baudrate=115200):
-        self.serial_port = serial_port or self.detect_nxp_port()
+        self.serial_port = serial_port or self.detect_serial_port()
         self.baudrate = baudrate
         self.serial_conn = None
         self.running = False
@@ -53,26 +52,25 @@ class UnoQOrchestrator:
                 "consensus": "INITIALIZING",
                 "smollm": {},
                 "qwen": {},
-                "causal": "Awaiting NXP hardware frame stream..."
+                "causal": "Awaiting Arduino UNO Q MCU frame stream..."
             }
         }
         self.simulated_override = None
 
-    def detect_nxp_port(self):
-        """Auto-detect NXP FRDM or Arduino modem ports."""
-        candidates = glob.glob("/dev/cu.usbmodemFIK*") + glob.glob("/dev/cu.usbmodem*") + glob.glob("/dev/ttyACM*")
+    def detect_serial_port(self):
+        """Auto-detect Arduino UNO Q Bridge /dev/ttyACM0 or USB modem ports."""
+        candidates = glob.glob("/dev/ttyACM*") + glob.glob("/dev/cu.usbmodem*") + glob.glob("/dev/ttyUSB*")
         for port in candidates:
-            if "FIK" in port or "usbmodem" in port:
-                return port
-        return "/dev/cu.usbmodemFIK54L1PUAFFP3"
+            return port
+        return "/dev/ttyACM0"
 
     def connect_serial(self):
         if not self.serial_port or not os.path.exists(self.serial_port):
-            print(f"[UNO Q] Warning: NXP port {self.serial_port} not found. Running in hardware-ready loop.")
+            print(f"[UNO Q] Warning: Serial port {self.serial_port} not found. Running in hardware-ready loop.")
             return False
         try:
             self.serial_conn = serial.Serial(self.serial_port, self.baudrate, timeout=1)
-            print(f"[UNO Q] Connected to live NXP FRDM board on {self.serial_port} @ {self.baudrate}")
+            print(f"[UNO Q] Connected to live Arduino UNO Q MCU on {self.serial_port} @ {self.baudrate}")
             return True
         except Exception as e:
             print(f"[UNO Q] Serial connection error: {e}")
@@ -88,7 +86,7 @@ class UnoQOrchestrator:
         if self.simulated_override:
             rssi, snr, per, retries, jitter, tinyml_cls = self.simulated_override
         else:
-            # Derived from NXP live packet (status byte: 0=Normal, 1=Degrading, 2=Critical, 3=Heartbeat)
+            # Derived from MCU Bridge live packet (status byte: 0=Normal, 1=Degrading, 2=Critical, 3=Heartbeat)
             if raw_status == 0 or raw_status == 3:
                 rssi, snr, per, retries, jitter, tinyml_cls = -62.0, 24.0, 0.01, 0, 8.0, "NORMAL"
             elif raw_status == 1:
@@ -187,7 +185,7 @@ class UnoQOrchestrator:
         self.connect_serial()
         print("\n" + "=" * 74)
         print(" 🦥 ARDUINO UNO Q DUAL-MODEL SENTINEL & LAYA DECISION LAYER")
-        print(f" Target NXP Port: {self.serial_port}")
+        print(f" Target Serial Port: {self.serial_port}")
         print(" Models: smollm2:135m (Triage) + qwen3:0.6b (Deep Reasoner) via Ollama")
         print(" Decision Layer: Laya System-1 NOULs (Deterministic Hardware Invariant)")
         print("=" * 74)
@@ -195,7 +193,7 @@ class UnoQOrchestrator:
         while self.running:
             self.check_timeouts()
 
-            # Read NXP Hardware Serial Stream
+            # Read Arduino UNO Q Hardware Serial Stream
             if self.serial_conn and self.serial_conn.is_open:
                 try:
                     header = self.serial_conn.read(1)

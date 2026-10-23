@@ -27,7 +27,7 @@
           <span class="hud-tag">MIL-SPEC EDGE AI</span>
           <span class="hud-tag location-tag">SIR MVIT · 13.1511° N, 77.6084° E</span>
         </div>
-        <p class="hud-subtitle">DUAL-CORE SENTINEL · ARDUINO UNO Q (LINUX + QWEN 0.6B) · NXP FRDM-MCXN236 (TINYML INT8)</p>
+        <p class="hud-subtitle">DUAL-CORE SENTINEL · ARDUINO UNO Q (QUALCOMM LINUX + STM32U585 CORTEX-M33)</p>
       </div>
     </div>
     
@@ -54,7 +54,7 @@
   <!-- KPI Tactical Bar (Sharp Edges) -->
   <section class="kpi-grid">
     <div class="kpi-panel">
-      <div class="panel-header">NODE 01 STATUS (NXP FRDM)</div>
+      <div class="panel-header">NODE 01 STATUS (STM32U585 MCU)</div>
       <div class="kpi-main">
         <span class="kpi-status green-text" id="kpiNode1Status">NORMAL</span>
         <span class="kpi-aux" id="kpiNode1Rssi">-62 dBm</span>
@@ -111,7 +111,7 @@
 
         <div class="cad-map-bot-overlay">
           <div class="legend-item"><span class="legend-sq green"></span> GATEWAY (UNO Q)</div>
-          <div class="legend-item"><span class="legend-sq blue"></span> NXP M33 SENTINEL</div>
+          <div class="legend-item"><span class="legend-sq blue"></span> STM32U585 M33 SENTINEL</div>
           <div class="legend-item"><span class="legend-sq yellow"></span> ESP32 RELAYS</div>
           <div class="legend-item"><span class="legend-sq red"></span> RF JAM / CRITICAL</div>
           <div class="legend-item map-zoom-info" id="mapCenterInfo">Sir MVIT Campus · Yelahanka, Bengaluru</div>
@@ -231,7 +231,7 @@
         <div class="console-body" id="consoleBody">
           <div class="c-line info">[BOOT] Initialized RESq Mesh / SlothMesh Tactical CAD</div>
           <div class="c-line info">[GEO] Radar FOCAL coordinates set to Sir MVIT: 13.151128, 77.608432</div>
-          <div class="c-line success">[NXP] Attached to /dev/cu.usbmodemFIK54L1PUAFFP3 (115200 baud)</div>
+          <div class="c-line success">[BRIDGE] Attached to /dev/ttyACM0 (115200 baud)</div>
           <div class="c-line success">[SLM] Local Qwen 3 (0.6B) ready via Ollama (100% offline)</div>
           <div class="c-line normal">[00:00:01] Node-01 Link NORMAL. Power-saving Sloth nap engaged...</div>
         </div>
@@ -242,7 +242,7 @@
   <!-- Tactical HUD Footer -->
   <footer class="hud-footer">
     <div class="f-item">LOCATION: SIR M. VISVESVARAYA INSTITUTE OF TECHNOLOGY (SIR MVIT), BENGALURU</div>
-    <div class="f-item">TARGET: ARDUINO UNO Q & NXP FRDM-MCXN236</div>
+    <div class="f-item">TARGET: ARDUINO UNO Q (QUALCOMM LINUX + STM32U585 M33)</div>
     <div class="f-item">DEV CHALLENGE: SLOW & STEADY / BEST USE OF ARDUINO ($200)</div>
   </footer>
 

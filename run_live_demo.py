@@ -1,67 +1,86 @@
 #!/usr/bin/env python3
 """
-🦥 RESq Mesh / SlothMesh Live Hardware & Dual-Model Cognitive Demo
-Hardware: Arduino UNO Q (Linux AP + Cortex-M33) & NXP FRDM-MCXN236 Cortex-M33
-Models: smollm2:135m (Fast Triage) + qwen3:0.6b (Deep Causal Reasoner) via Ollama
+🦥 SlothMesh Live Hardware & Dual-Model Cognitive Demo
+Target Hardware: Arduino UNO Q (Qualcomm Linux AP + STM32U585 Cortex-M33)
+Models: smollm2:135m (Instant Edge Triage) + qwen3:0.6b (Deep Causal Reasoner) via Ollama
 Decision Layer: Laya System-1 NOULs (Deterministic Safety Invariants)
 
-Interactive Demo Flow for Judges:
-1. NORMAL: Ingests real NXP hardware packets from /dev/cu.usbmodemFIK54L1PUAFFP3.
-2. DEGRADING: Simulates rain fade & multipath; SmolLM rapid triage + Qwen3 causal analysis + Laya antenna switch.
-3. CRITICAL: Simulates severe RF blackout; SmolLM + Qwen3 analyze collapse; Laya enforces emergency frequency hop.
-4. RECOVERY: Restores clean channel; returns to energy-efficient Sloth pacing.
+Interactive Demo Flow:
+1. NORMAL: Ingests nominal telemetry (RSSI: -58 dBm, SNR: 28 dB, PER: 1%). Paced sleep mode.
+2. DEGRADING: Simulates rain fade & multipath (-82 dBm, PER: 28%). SmolLM rapid triage + Qwen3 causal attribution + Antenna diversity toggle (GPIO 4).
+3. CRITICAL: Simulates severe RF blackout / jamming (-95 dBm, PER: 74%). Laya safety engine enforces emergency channel failover.
+4. RECOVERY: Restores clean channel (Channel 11); returns to energy-paced Sloth sleep mode.
+
+Supports:
+  --simulate: Pure simulation mode (runs without physical board attached)
+  --hardware: Attempts connection to physical Arduino UNO Q USB serial port
 """
 
 import sys
 import os
 import time
+import argparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "uno_q_core"))
 from uno_q_service import UnoQOrchestrator
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="SlothMesh Live Demo")
+    parser.add_argument("--simulate", action="store_true", default=False, help="Run pure software simulation without hardware")
+    parser.add_argument("--hardware", action="store_true", default=False, help="Connect to physical Arduino UNO Q serial port")
+    return parser.parse_args()
+
 def main():
+    args = parse_args()
+    simulate_mode = args.simulate or not args.hardware
+
     print("=" * 74)
-    print(" 🦥 RESq MESH / SLOTHMESH: LIVE HARDWARE & DUAL-MODEL DEMO")
-    print(" Hardware: Arduino UNO Q + NXP FRDM-MCXN236 Cortex-M33")
+    print(" 🦥 SLOTHMESH: COGNITIVE EDGE MESH LIVE DEMO")
+    print(" Target: Arduino UNO Q (Qualcomm Linux AP + STM32U585 Cortex-M33)")
+    print(f" Execution Mode: {'SIMULATION (--simulate)' if simulate_mode else 'PHYSICAL HARDWARE (--hardware)'}")
     print(" Tier 1 AI: smollm2:135m (Instant Edge Triage, 270MB)")
     print(" Tier 2 AI: qwen3:0.6b   (Deep Causal Attribution, 522MB)")
-    print(" Tier 3 Arbiter: Laya System-1 NOULs (Deterministic Safety Layer)")
+    print(" Tier 3 Arbiter: Laya System-1 NOULs (Deterministic Safety Invariants)")
     print("=" * 74)
 
     orchestrator = UnoQOrchestrator()
-    print("\n[STEP 1] Ingesting Live NXP Hardware Frames (0xA5 Protocol)...")
-    orchestrator.connect_serial()
-    
-    # Read 3 real hardware frames from NXP
-    read_count = 0
-    start_t = time.time()
-    while read_count < 3 and (time.time() - start_t) < 6:
-        if orchestrator.serial_conn and orchestrator.serial_conn.is_open:
-            hdr = orchestrator.serial_conn.read(1)
-            if hdr == b'\xa5':
-                payload = orchestrator.serial_conn.read(8)
-                if len(payload) == 8:
-                    orchestrator.process_telemetry(payload[0], payload[1], int.from_bytes(payload[2:6], 'big'))
-                    read_count += 1
-        time.sleep(0.1)
 
-    if read_count == 0:
-        print("[UNO Q] Note: Running with synthesized nominal baseline for demonstration.")
+    if not simulate_mode:
+        print("\n[STEP 1] Connecting to Physical Arduino UNO Q Serial Port...")
+        orchestrator.connect_serial()
+        read_count = 0
+        start_t = time.time()
+        while read_count < 3 and (time.time() - start_t) < 5:
+            if orchestrator.serial_conn and orchestrator.serial_conn.is_open:
+                hdr = orchestrator.serial_conn.read(1)
+                if hdr in [b'\xa5', b'\x53']:
+                    payload = orchestrator.serial_conn.read(8)
+                    if len(payload) == 8:
+                        orchestrator.process_telemetry(payload[0], payload[1], int.from_bytes(payload[2:6], 'big'))
+                        read_count += 1
+            time.sleep(0.1)
+
+        if read_count == 0:
+            print("[UNO Q] No incoming physical frames detected within 5s. Falling back to nominal baseline.")
+            orchestrator.process_telemetry(1, 0, 100)
+    else:
+        print("\n[STEP 1] Ingesting Nominal Link Telemetry (M33 Energy-Paced Mode)...")
+        time.sleep(0.5)
         orchestrator.process_telemetry(1, 0, 100)
 
-    print("\n[STEP 2] Simulating RF Degradation (Rain Fade / Multipath)...")
+    print("\n[STEP 2] Injecting RF Degradation (Rain Fade / Multipath Scattering)...")
     print(">>> Triggering Dual-Model Pipeline: SmolLM (Triage) + Qwen3 (Causal Reasoner)...")
     time.sleep(1.0)
     orchestrator.simulated_override = (-82.0, 9.0, 0.28, 4, 38.0, "DEGRADING")
     orchestrator.process_telemetry(1, 1, 101)
 
-    print("\n[STEP 3] Simulating Critical Channel Collapse (Co-Channel Jamming)...")
+    print("\n[STEP 3] Injecting Critical Link Collapse (Co-Channel Jamming / Bleed)...")
     print(">>> Triggering Dual-Model Pipeline: SmolLM (Triage) + Qwen3 (Causal Reasoner)...")
     time.sleep(1.0)
     orchestrator.simulated_override = (-95.0, 2.0, 0.74, 9, 120.0, "CRITICAL")
     orchestrator.process_telemetry(1, 2, 102)
 
-    print("\n[STEP 4] Channel Stabilized (Full Recovery)...")
+    print("\n[STEP 4] Channel Stabilized (Full Mesh Recovery)...")
     time.sleep(1.0)
     orchestrator.simulated_override = None
     orchestrator.process_telemetry(1, 0, 103)

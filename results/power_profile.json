@@ -1,0 +1,30 @@
+{
+  "mcu_domain_3v3": {
+    "rail_voltage_v": 3.3,
+    "period_sec": 5.0,
+    "t_active_sec": 0.00118,
+    "t_active_provenance": "MEASURED (ARM DWT cycle counter on Cortex-M33)",
+    "i_sleep_typical_ua": 35.0,
+    "i_sleep_provenance": "ESTIMATED (STM32U5 Stop 3 datasheet typical)",
+    "i_active_typical_ma": 15.0,
+    "i_active_provenance": "ESTIMATED (STM32U5 160MHz run mode typical)",
+    "derived_avg_current_ua": 38.53,
+    "derived_avg_power_uw": 127.15,
+    "status": "ESTIMATED"
+  },
+  "whole_board_domain_5v0": {
+    "rail_voltage_v": 5.0,
+    "fair_baseline_description": "Same board without TinyML: Host wakes every 10s for 1.2s to sample Wi-Fi",
+    "baseline_active_current_ma": 450.0,
+    "baseline_sleep_current_ma": 110.0,
+    "baseline_avg_current_ma": 150.8,
+    "slothmesh_description": "Host in deep suspend; wakes only on TinyML anomaly (4 events/day)",
+    "slothmesh_active_current_ma": 1100.0,
+    "slothmesh_suspend_current_ma": 110.0,
+    "slothmesh_avg_current_ma": 110.08,
+    "whole_board_energy_reduction_pct": 27.0,
+    "status": "ESTIMATED"
+  },
+  "hardware_measurement_guide": "docs/POWER_MEASUREMENT.md",
+  "timestamp": "2026-10-23 16:55:40 UTC"
+}

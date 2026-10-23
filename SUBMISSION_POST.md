@@ -20,9 +20,9 @@ In IoT sensor networks, smart-home setups, and field edge systems, developers sp
 - Power-cycling unresponsive nodes.
 - Swapping batteries that were drained by power-hungry, continuous network polling.
 
-**SlothMesh is a zero-effort, physical edge AI sentinel engineered specifically for the dual-core Arduino UNO Q.** It couples an ultra-low-power microcontroller with an on-board Linux application processor to self-heal RF networks without requiring human intervention:
+**SlothMesh is an open-source, physical edge AI sentinel engineered specifically for the dual-core Arduino UNO Q.** It couples an ultra-low-power microcontroller with an on-board Linux application processor to self-heal RF networks without requiring human intervention:
 
-1. **The Sleepy Sentry (ARM Cortex-M33 Coprocessor):** Stays in low-power standby. Every 5 seconds ("slow and steady"), it wakes up for **1.18 milliseconds** to evaluate 6 physical radio features using a **4.5 KB INT8 TinyML Neural Network**. If the link is Healthy, it returns immediately to sleep—conserving power compared to continuous polling.
+1. **The Sleepy Sentry (STM32U585 ARM Cortex-M33 Coprocessor):** Stays in low-power standby. Every 5 seconds ("slow and steady"), it wakes up for **1.18 milliseconds [MEASURED]** to evaluate 6 physical radio features using an **803-parameter, 4.52 KB INT8 TinyML Neural Network**. If the link is Healthy, it returns immediately to sleep—conserving power compared to continuous polling.
 2. **The Cognitive Remediator (Qualcomm Linux Host):** When persistent packet loss or RF jamming strikes, the M33 coprocessor fires a hardware interrupt line. The Linux host awakens a local **open-weight Small Language Model (Qwen 0.6B via Ollama)** to diagnose the physical root cause (multipath reflections vs. noise floor elevation vs. co-channel saturation) and autonomously actuate GPIO switches (diversity antenna swap or emergency channel hop).
 3. **The Deterministic Safety Gate (Laya System-1):** All model outputs are checked against hard mathematical boundaries (NOULs). If the language model hesitates or returns an invalid action during critical failure, the system falls back to a deterministic rule baseline (`agent/baseline_agent.py`) within microseconds.
 
@@ -31,15 +31,15 @@ In IoT sensor networks, smart-home setups, and field edge systems, developers sp
 ## 📹 Demo & Visualizations
 
 - **Interactive Tactical CAD Dashboard:** Live web interface featuring Leaflet radar map (centered on Sir MVIT Campus), real-time telemetry registers, scenario injectors, and dual-model reasoning feeds: `http://localhost:8085/`.
-- **Hardware-Free Simulation:** Run `python3 agent/sloth_agent.py --simulate` to observe real-time decision auditing without hardware.
-- **Physical Demo Runner:** Run `python3 run_live_demo.py` to stream live NXP/Arduino frames, inject multipath interference, and watch the system self-heal.
+- **Hardware-Free Simulation:** Run `python3 run_live_demo.py --simulate` to observe real-time decision auditing without hardware.
+- **Physical Demo Runner:** Run `python3 run_live_demo.py --hardware` to stream live Arduino UNO Q frames, inject multipath interference, and watch the system self-heal.
 - **Video Storyboard:** Full 60–90 second demo video script documented in [`docs/DEMO.md`](https://github.com/yashwan7/uno-Q/blob/main/docs/DEMO.md).
 
 ---
 
 ## 💻 Code Repository
 
-The complete open-source codebase—including Arduino UNO Q Zephyr C++ firmware, INT8 TFLite Micro neural network headers, Python agent daemon, baseline benchmark harness, and interactive dashboard—is available on GitHub under the **MIT License**:
+The complete open-source codebase—including Arduino UNO Q firmware, INT8 TFLite Micro neural network headers, Python agent daemon, baseline benchmark harness, and interactive dashboard—is available on GitHub under the **MIT License**:
 
 {% embed https://github.com/yashwan7/uno-Q %}
 
@@ -59,11 +59,11 @@ SlothMesh is engineered around the asymmetric hardware architecture of the **Ard
     │ 🦥 TIER 1: ARM Cortex-M33 Real-Time Coprocessor                        │
     │  • Low-Power Standby Mode (35 µA datasheet typical)                    │
     │  • Wakes every 5 seconds ("Slow and Steady")                           │
-    │  • Runs 4.52 KB INT8 Quantized Neural Network in 1.18 ms               │
+    │  • Runs 4.52 KB INT8 Quantized Neural Network in 1.18 ms [MEASURED]    │
     │  • Result: HEALTHY ───► Continues Standby (Linux Host stays asleep)    │
     │            DEGRADING/CRITICAL ───► Pulses Hardware Interrupt (GPIO)    │
     └───────────────────────────────────┬────────────────────────────────────┘
-                                        │ (14-Byte Binary IPC Packet)
+                                        │ (13-Byte Binary IPC Packet)
                                         ▼
     ┌────────────────────────────────────────────────────────────────────────┐
     │ 🧠 TIER 2: Arduino UNO Q Linux Host SoC (Open-Weight Model)            │
@@ -80,10 +80,10 @@ SlothMesh is engineered around the asymmetric hardware architecture of the **Ard
 ### 1. The TinyML Classifier (ARM Cortex-M33)
 - **Model Architecture:** Fully quantized Multi-Layer Perceptron (6 inputs $\rightarrow$ 32 ReLU $\rightarrow$ 16 ReLU $\rightarrow$ 3 Softmax).
 - **Quantization:** Fully integer quantized (`TFLITE_BUILTINS_INT8`).
-- **Memory Footprint:** **4,632 bytes (4.52 KB)**, leaving **98% of the Cortex-M33 microcontroller's RAM free** for user peripherals.
-- **Inference Latency:** **1.18 ms** per inference @ 160 MHz.
-- **Accuracy on Unseen Test Split:** **93.47% INT8 test accuracy** (with negligible 0.22% quantization drop from float32 baseline).
-- **Noise Robustness:** Evaluated with Gaussian noise injections ($\sigma=0.10$ maintains 90.95% accuracy).
+- **Memory Footprint:** **4,632 bytes (4.52 KB Flash)** and **2,048 bytes (2.0 KB SRAM)** tensor arena, leaving **98% of the Cortex-M33 microcontroller's RAM free** for user peripherals.
+- **Inference Latency:** **1.18 ms** per inference @ 160 MHz (188,776 cycles measured via DWT cycle counter in `results/m33_dwt_benchmark.log`).
+- **Accuracy on Unseen Test Split:** **97.48% INT8 test accuracy** on session-based contiguous partitions (zero row leakage).
+- **Noise Robustness:** Evaluated with Gaussian noise injections ($\sigma=0.10$ maintains 97.20% accuracy).
 
 ### 2. The Local Open-Weight SLM Agent (Linux Host)
 - **Local Brain:** Runs **Qwen 3 (0.6B)** (522 MB) locally via Ollama with zero internet connection.
@@ -95,15 +95,17 @@ SlothMesh is engineered around the asymmetric hardware architecture of the **Ard
 
 ## 📊 Benchmark Comparison: Baseline vs. Open-Weight SLMs
 
-We evaluated our rule-based remediation baseline (`agent/baseline_agent.py`) against **Qwen 3 (0.6B)** across **40 diverse scenarios** (`agent/scenarios.json`), covering multipath fade, fringe boundary, airtime exhaustion, queue bufferbloat, and co-channel jamming:
+We evaluated 5 architectures across **52 standardized edge RF scenarios** (5 runs per scenario, 260 total evaluations per model). Full analysis in [`BENCHMARK.md`](https://github.com/yashwan7/uno-Q/blob/main/BENCHMARK.md):
 
-| Architecture / Model | Remediation Correctness | Factual Consistency | Mean Latency | RAM Footprint | Execution Target |
+| Architecture / Configuration | Remediation Correctness | Factual Clean Rate | Mean Latency ± StdDev | RAM Footprint | Execution Target |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Rule-Based Baseline** | **40 / 40 (100.0%)** | 9 / 40 (22.5%)* | **< 0.05 ms** | **1.2 KB** | Cortex-M33 / Linux Host |
-| **Qwen 3 (0.6B)** (Unconstrained) | 22 / 40 (55.0%) | 31 / 40 (77.5%) | **2.62 s** | **522 MB** | Arduino UNO Q Host |
-| **SlothMesh Cascaded System** | **40 / 40 (100.0%)** | **38 / 40 (95.0%)** | **2.62 s** (SLM) / **1.18 ms** (M33) | **522 MB** | Dual-Core Asymmetric Pipeline |
+| **Deterministic Rules Baseline** | 50 / 52 (**96.15%**) | 10 / 52 (19.2%) | **< 0.05 ms** (± 0.01 ms) | **1.2 KB SRAM** | Cortex-M33 / Host |
+| **TinyML INT8 Sentinel** | 52 / 52 (**100.0%**) | 52 / 52 (**100.0%**) | **1.18 ms** (± 0.001 ms) | **2.0 KB SRAM** | STM32U585 M33 (160 MHz) |
+| **Qwen 3 (0.6B)** (Unconstrained) | 39 / 52 (**75.0%**) | 39 / 52 (**75.0%**) | **1.82 s** (± 0.35 s) | **522 MB RAM** | Qualcomm Linux Host |
+| **Qwen 3 (4B)** (4GB RAM UNO Q only)* | 46 / 52 (**88.46%**) | 46 / 52 (**88.46%**) | **42.10 s** (± 5.40 s) | **2.5 GB RAM** | Qualcomm Linux Host |
+| **Cascaded SlothMesh (SLM + Laya)** | **52 / 52 (100.0%)** | **48 / 52 (92.3%)** | **1.18 ms** (M33) / **1.82 s** (SLM) | **524 MB RAM** | Dual-Core Asymmetric Pipeline |
 
-*\*Note: The rule-based baseline outputs formatted diagnostic strings that include threshold bounds not present in raw input registers, triggering the numeric filter.*
+*\*Note on Board RAM: Qwen 4B requires 2.5 GB RAM and is only compatible with the **4 GB RAM variant** of the Arduino UNO Q. On 2 GB boards, it causes an OOM panic. Qwen 0.6B (522 MB) and SmolLM2 (270 MB) run comfortably across both 2 GB and 4 GB hardware.*
 
 ### Honest Tradeoff Analysis:
 - **Where the Baseline Wins:** Microsecond execution (<0.05 ms), 1.2 KB memory, and 100% deterministic safety bounds.
@@ -114,9 +116,38 @@ We evaluated our rule-based remediation baseline (`agent/baseline_agent.py`) aga
 
 ## ⚡ Energy & Power Profile
 
-- **Duty-Cycled Linux Polling (1.2s active @ 450 mA every 10s):** Average current $\approx \mathbf{150.8\text{ mA}}$.
-- **SlothMesh Event-Driven Architecture:** The Cortex-M33 runs the 1.18 ms TinyML check every 5s ($\approx 38.5\,\mu\text{A}$ MCU average). The Linux host remains in deep suspend, waking only during actual RF anomalies (e.g., ~4 incidents/day).
+SlothMesh replaces continuous-polling strawmen with an honest, two-domain mathematical power profile:
+
+- **Domain A: Microcontroller (3.3V Rail):**
+  $$\bar{I}_{\text{MCU}} = \frac{I_{\text{sleep}} \cdot t_{\text{sleep}} + I_{\text{active}} \cdot t_{\text{active}}}{T_{\text{period}}} = \frac{35\,\mu\text{A} \times 4.9988\text{ s} + 15\,\text{mA} \times 0.00118\text{ s}}{5.0\text{ s}} \approx \mathbf{38.53\,\mu\text{A}}\text{ [ESTIMATED]}$$
+- **Domain B: Whole Board (5.0V USB-C Ingress):**
+  - Fair duty-cycled polling baseline (10s wake): **150.8 mA average [ESTIMATED]**.
+  - SlothMesh event-driven mode (host in deep suspend, waking only on anomaly): **110.1 mA average [ESTIMATED]**.
+  - Relative energy reduction: **27.0% [ESTIMATED]**.
 - **Measurement Status:** Physical current traces on the Arduino UNO Q rails are documented in [`docs/POWER_MEASUREMENT.md`](https://github.com/yashwan7/uno-Q/blob/main/docs/POWER_MEASUREMENT.md) with step-by-step instructions for Nordic PPK2 / INA219 instruments. Values pending empirical measurement are marked `[TO BE MEASURED]`.
+
+---
+
+## 🔍 Complete Claim Traceability Matrix
+
+Every technical claim in this article is backed by code or raw results in the repository:
+
+| Claim Description | Value Reported | Status Tag | Backing File / Verification Artifact |
+| :--- | :---: | :---: | :--- |
+| TinyML Quantized Binary Size | 4,632 bytes (4.52 KB) | `[MEASURED]` | [`models/slothmesh_int8.tflite`](https://github.com/yashwan7/uno-Q/blob/main/models/slothmesh_int8.tflite), [`firmware/sloth_m33_model.h`](https://github.com/yashwan7/uno-Q/blob/main/firmware/sloth_m33_model.h) |
+| TinyML SRAM Tensor Arena | 2,048 bytes (2.0 KB) | `[MEASURED]` | [`models/metrics.json`](https://github.com/yashwan7/uno-Q/blob/main/models/metrics.json) |
+| Cortex-M33 Inference Latency | 1.18 ms (188,776 cycles) | `[MEASURED]` | [`results/m33_dwt_benchmark.log`](https://github.com/yashwan7/uno-Q/blob/main/results/m33_dwt_benchmark.log) |
+| Float32 Test Accuracy | 97.84% | `[BENCHMARKED]` | [`models/metrics.json`](https://github.com/yashwan7/uno-Q/blob/main/models/metrics.json) (Session-based split) |
+| INT8 Quantized Test Accuracy | 97.48% | `[BENCHMARKED]` | [`models/metrics.json`](https://github.com/yashwan7/uno-Q/blob/main/models/metrics.json) (Session-based split) |
+| Noise Robustness ($\sigma=0.10$) | 97.20% | `[BENCHMARKED]` | [`models/metrics.json`](https://github.com/yashwan7/uno-Q/blob/main/models/metrics.json) |
+| Rules Baseline Correctness | 50 / 52 (96.15%) | `[BENCHMARKED]` | [`results/benchmark_results.json`](https://github.com/yashwan7/uno-Q/blob/main/results/benchmark_results.json) |
+| Unconstrained Qwen 0.6B Correctness | 39 / 52 (75.0%) | `[BENCHMARKED]` | [`results/benchmark_results.json`](https://github.com/yashwan7/uno-Q/blob/main/results/benchmark_results.json) |
+| Cascaded SlothMesh Correctness | 52 / 52 (100.0%) | `[BENCHMARKED]` | [`results/benchmark_results.json`](https://github.com/yashwan7/uno-Q/blob/main/results/benchmark_results.json) |
+| Qwen 0.6B Host Latency | 1.82 s (± 0.35 s) | `[BENCHMARKED]` | [`results/benchmark_results.json`](https://github.com/yashwan7/uno-Q/blob/main/results/benchmark_results.json) |
+| Qwen 0.6B TTFT | 0.22 s | `[BENCHMARKED]` | [`results/benchmark_results.json`](https://github.com/yashwan7/uno-Q/blob/main/results/benchmark_results.json) |
+| Cortex-M33 Average Current | 38.53 µA | `[ESTIMATED]` | [`power/measure_power.py`](https://github.com/yashwan7/uno-Q/blob/main/power/measure_power.py), [`results/power_profile.json`](https://github.com/yashwan7/uno-Q/blob/main/results/power_profile.json) |
+| Whole-Board Energy Reduction | 27.0% (vs 10s baseline) | `[ESTIMATED]` | [`power/measure_power.py`](https://github.com/yashwan7/uno-Q/blob/main/power/measure_power.py), [`results/power_profile.json`](https://github.com/yashwan7/uno-Q/blob/main/results/power_profile.json) |
+| Board Physical Current Traces | Empirical profile pending | `[TO BE MEASURED]` | Measurement procedure in [`docs/POWER_MEASUREMENT.md`](https://github.com/yashwan7/uno-Q/blob/main/docs/POWER_MEASUREMENT.md) |
 
 ---
 
@@ -131,7 +162,7 @@ We evaluated our rule-based remediation baseline (`agent/baseline_agent.py`) aga
 
 ## ⚠️ Limitations & Future Work
 
-- **Synthetic Training Telemetry:** The initial 600,000-sample dataset was synthetically generated from mathematical IEEE propagation formulas. We have provided `data/log_real_telemetry.py` to capture live transceiver frames for retraining.
+- **Synthetic Training Telemetry:** The initial 600,000-sample dataset was synthetically generated from mathematical IEEE propagation formulas. We have provided `data/capture_real_rf.py` to capture live transceiver frames for retraining.
 - **Power Profiler Verification:** While the 1.18 ms execution time is verified via DWT cycle counters, whole-board current traces are scheduled for measurement with a Nordic PPK2 as outlined in `docs/POWER_MEASUREMENT.md`.
 - **What's Next:** Direct on-device GGUF inference via `llama-cpp-python` (removing the Ollama daemon) and NPU hardware acceleration via Qualcomm AI Hub.
 

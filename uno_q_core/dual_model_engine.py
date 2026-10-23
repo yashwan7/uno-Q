@@ -5,7 +5,7 @@ Target Platform: Arduino UNO Q (Linux Application Processor + STM32U5 Cortex-M33
 
 Architecture:
   ┌─────────────────────────────────────────────────────────────┐
-  │ Physical Telemetry Stream (NXP M33 Frame / Real RF Metrics) │
+  │ Physical Telemetry Stream (UNO Q MCU Frame/Real RF Metrics) │
   │ RSSI, SNR, PER, Retries, Jitter, TinyML hardware class       │
   └──────────────────────────────┬──────────────────────────────┘
                                  │

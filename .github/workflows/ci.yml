@@ -27,7 +27,7 @@ jobs:
 
     - name: Python Syntax & Compilation Verification
       run: |
-        python -m py_compile agent/*.py models/*.py tests/*.py uno_q_core/*.py run_live_demo.py
+        python -m py_compile agent/*.py models/*.py tests/*.py uno_q_core/*.py power/*.py data/*.py run_live_demo.py
 
     - name: Run Pytest Test Suite
       run: |
@@ -35,11 +35,17 @@ jobs:
 
     - name: Run Mocked Benchmark Verification
       run: |
-        python agent/sloth_benchmark_eval.py --mock
+        python agent/sloth_benchmark_eval.py --mock --runs 5
+
+    - name: Run Power Profiler Verification
+      run: |
+        python power/measure_power.py
 
     - name: Verify Metrics and Scenario Files Exist
       run: |
         test -f models/metrics.json
         test -f agent/scenarios.json
         test -f data/slothmesh_telemetry_dataset.csv
+        test -f results/benchmark_results.json
+        test -f results/power_profile.json
         echo "All critical artifacts verified."

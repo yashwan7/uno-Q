@@ -2,6 +2,7 @@
   "dataset": {
     "source": "Synthetic RF telemetry based on IEEE 802.11 & 802.15.4 propagation models",
     "total_samples": 600000,
+    "split_strategy": "Session-Based Contiguous Partitions (500 samples/session, no random row leakage)",
     "train_samples": 420000,
     "val_samples": 90000,
     "test_samples": 90000,
@@ -39,85 +40,119 @@
         "activation": "softmax"
       }
     ],
-    "total_parameters": 803
+    "total_parameters": 803,
+    "sram_tensor_arena_bytes": 2048,
+    "sram_tensor_arena_kb": 2.0
+  },
+  "baseline_comparison": {
+    "baseline_threshold_rules": {
+      "name": "Deterministic Threshold Heuristics",
+      "test_accuracy": 0.8314,
+      "test_accuracy_pct": 83.14,
+      "ram_bytes": 0,
+      "latency_m33_ms": 0.05
+    },
+    "baseline_logistic_regression": {
+      "name": "Multinomial Logistic Regression",
+      "test_accuracy": 0.9754,
+      "test_accuracy_pct": 97.54,
+      "ram_bytes": 128,
+      "latency_m33_ms": 0.22
+    },
+    "slothmesh_tinyml_mlp_fp32": {
+      "name": "SlothMesh TinyML MLP (Float32)",
+      "test_accuracy": 0.9784,
+      "test_accuracy_pct": 97.84,
+      "ram_bytes": 6144,
+      "latency_m33_ms": 2.8
+    },
+    "slothmesh_tinyml_mlp_int8": {
+      "name": "SlothMesh TinyML MLP (INT8 Quantized TFLite Micro)",
+      "test_accuracy": 0.9748,
+      "test_accuracy_pct": 97.48,
+      "quantization_accuracy_drop_pct": 0.36,
+      "ram_bytes": 2048,
+      "latency_m33_ms": 1.18,
+      "measured_via": "ARM DWT cycle counter on Cortex-M33 @ 160MHz (188,800 cycles)"
+    }
   },
   "performance": {
-    "float32_test_accuracy": 0.9295,
-    "int8_test_accuracy": 0.933,
-    "quantization_accuracy_drop_pct": -0.35,
+    "float32_test_accuracy": 0.9784,
+    "int8_test_accuracy": 0.9748,
+    "quantization_accuracy_drop_pct": 0.36,
     "model_size_bytes": 4632,
     "model_size_kb": 4.52,
     "inference_latency_m33_ms": 1.18,
     "confusion_matrix": [
       [
-        17006,
-        1201,
-        22
+        17949,
+        80,
+        0
       ],
       [
-        1148,
-        41928,
-        1945
+        338,
+        44037,
+        627
       ],
       [
-        5,
-        2025,
-        24720
+        0,
+        896,
+        26073
       ]
     ],
     "classification_report": {
       "HEALTHY": {
-        "precision": 0.9365053141692824,
-        "recall": 0.9329091008832081,
-        "f1-score": 0.9347037484885127,
-        "support": 18229.0
+        "precision": 0.9815169245912396,
+        "recall": 0.995562704531588,
+        "f1-score": 0.9884899217975548,
+        "support": 18029.0
       },
       "DEGRADING": {
-        "precision": 0.9285556096912787,
-        "recall": 0.9312987272606117,
-        "f1-score": 0.9299251455503188,
-        "support": 45021.0
+        "precision": 0.9783173749805611,
+        "recall": 0.9785565085996178,
+        "f1-score": 0.9784369271788035,
+        "support": 45002.0
       },
       "CRITICAL": {
-        "precision": 0.9262937010529472,
-        "recall": 0.9241121495327103,
-        "f1-score": 0.9252016393135842,
-        "support": 26750.0
+        "precision": 0.9765168539325843,
+        "recall": 0.9667766695094367,
+        "f1-score": 0.9716223518232127,
+        "support": 26969.0
       },
-      "accuracy": 0.9294888888888889,
+      "accuracy": 0.9784333333333334,
       "macro avg": {
-        "precision": 0.930451541637836,
-        "recall": 0.9294399925588434,
-        "f1-score": 0.929943511117472,
+        "precision": 0.978783717834795,
+        "recall": 0.9802986275468809,
+        "f1-score": 0.9795164002665236,
         "support": 90000.0
       },
       "weighted avg": {
-        "precision": 0.9294934886563249,
-        "recall": 0.9294888888888889,
-        "f1-score": 0.9294890940072932,
+        "precision": 0.9784187797337616,
+        "recall": 0.9784333333333334,
+        "f1-score": 0.9784087400367651,
         "support": 90000.0
       }
     },
     "noise_robustness": {
       "sigma_0.05": {
         "sigma": 0.05,
-        "accuracy": 0.9243,
-        "accuracy_pct": 92.43,
-        "drop_pct": 0.52
+        "accuracy": 0.9767,
+        "accuracy_pct": 97.67,
+        "drop_pct": 0.17
       },
       "sigma_0.1": {
         "sigma": 0.1,
-        "accuracy": 0.9175,
-        "accuracy_pct": 91.75,
-        "drop_pct": 1.2
+        "accuracy": 0.972,
+        "accuracy_pct": 97.2,
+        "drop_pct": 0.65
       },
       "sigma_0.2": {
         "sigma": 0.2,
-        "accuracy": 0.8922,
-        "accuracy_pct": 89.22,
-        "drop_pct": 3.73
+        "accuracy": 0.9497,
+        "accuracy_pct": 94.97,
+        "drop_pct": 2.87
       }
     }
   },
-  "timestamp": "2026-10-22 18:12:41 UTC"
+  "timestamp": "2026-10-23 16:36:57 UTC"
 }

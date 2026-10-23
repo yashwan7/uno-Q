@@ -18,9 +18,9 @@ const MESH_NODES = [
     icon: "📟"
   },
   {
-    id: "NXP_M33",
-    name: "NXP FRDM-MCXN236 Sentinel",
-    role: "Cortex-M33 TinyML RF Classifier",
+    id: "M33_SENTINEL",
+    name: "Arduino UNO Q (STM32U5 M33 Sentinel)",
+    role: "Cortex-M33 INT8 TinyML Classifier",
     coords: [13.152450, 77.607520], // Gate 1 / Tower Block
     color: "#00f0ff",
     icon: "🛡️"
@@ -158,7 +158,7 @@ function drawMeshLinks(status) {
     lineDash = "3, 6";
   }
 
-  // Links: NXP -> Gateway, ESP32 Alpha -> Gateway, ESP32 Beta -> Gateway
+  // Links: M33 Sentinel -> Gateway, ESP32 Alpha -> Gateway, ESP32 Beta -> Gateway
   const links = [
     [MESH_NODES[1].coords, MESH_NODES[0].coords],
     [MESH_NODES[2].coords, MESH_NODES[0].coords],
