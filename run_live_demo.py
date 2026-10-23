@@ -28,18 +28,20 @@ def parse_args():
     parser = argparse.ArgumentParser(description="SlothMesh Live Demo")
     parser.add_argument("--simulate", action="store_true", default=False, help="Run pure software simulation without hardware")
     parser.add_argument("--hardware", action="store_true", default=False, help="Connect to physical Arduino UNO Q serial port")
+    parser.add_argument("--deep-model", default=os.getenv("DEEP_SLM_MODEL", "qwen3:0.6b"), help="Deep causal reasoner SLM (e.g. qwen3:0.6b for 2GB/4GB boards, qwen3:4b for 4GB variant)")
     return parser.parse_args()
 
 def main():
     args = parse_args()
     simulate_mode = args.simulate or not args.hardware
+    os.environ["DEEP_SLM_MODEL"] = args.deep_model
 
     print("=" * 74)
     print(" 🦥 SLOTHMESH: COGNITIVE EDGE MESH LIVE DEMO")
     print(" Target: Arduino UNO Q (Qualcomm Linux AP + STM32U585 Cortex-M33)")
     print(f" Execution Mode: {'SIMULATION (--simulate)' if simulate_mode else 'PHYSICAL HARDWARE (--hardware)'}")
     print(" Tier 1 AI: smollm2:135m (Instant Edge Triage, 270MB)")
-    print(" Tier 2 AI: qwen3:0.6b   (Deep Causal Attribution, 522MB)")
+    print(f" Tier 2 AI: {args.deep_model:<12s} (Deep Causal Attribution {'[4GB RAM Variant]' if '4b' in args.deep_model else '[2GB/4GB Compatible]'})")
     print(" Tier 3 Arbiter: Laya System-1 NOULs (Deterministic Safety Invariants)")
     print("=" * 74)
 
